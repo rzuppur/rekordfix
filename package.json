@@ -1,0 +1,54 @@
+{
+  "name": "vite-electron-builder",
+  "description": "Secure boilerplate for Electron app based on Vite",
+  "private": true,
+  "author": {
+    "email": "kozackunisoft@gmail.com",
+    "name": "Alex Kozack",
+    "url": "https://kozack.me"
+  },
+  "main": "packages/main/dist/index.cjs",
+  "scripts": {
+    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
+    "build:main": "cd ./packages/main && vite build",
+    "build:preload": "cd ./packages/preload && vite build",
+    "build:renderer": "cd ./packages/renderer && vite build",
+    "compile": "cross-env MODE=production npm run build && electron-builder build --config .electron-builder.config.js --dir --config.asar=false",
+    "test": "npm run test:main && npm run test:preload && npm run test:renderer && npm run test:e2e",
+    "test:e2e": "npm run build && vitest run",
+    "test:main": "vitest run -r packages/main --passWithNoTests",
+    "test:preload": "vitest run -r packages/preload --passWithNoTests",
+    "test:renderer": "vitest run -r packages/renderer --passWithNoTests",
+    "watch": "node scripts/watch.mjs",
+    "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,vue",
+    "typecheck:main": "tsc --noEmit -p packages/main/tsconfig.json",
+    "typecheck:preload": "tsc --noEmit -p packages/preload/tsconfig.json",
+    "typecheck:renderer": "vue-tsc --noEmit -p packages/renderer/tsconfig.json",
+    "typecheck": "npm run typecheck:main && npm run typecheck:preload && npm run typecheck:renderer",
+    "postinstall": "cross-env ELECTRON_RUN_AS_NODE=1 electron scripts/update-electron-vendors.mjs",
+    "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,vue,json}\""
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "5.37.0",
+    "@vitejs/plugin-vue": "3.1.0",
+    "@vue/test-utils": "2.0.2",
+    "cross-env": "7.0.3",
+    "electron": "20.1.4",
+    "electron-builder": "23.3.3",
+    "eslint": "8.23.1",
+    "eslint-plugin-vue": "9.5.1",
+    "happy-dom": "6.0.4",
+    "nano-staged": "0.8.0",
+    "playwright": "1.25.2",
+    "simple-git-hooks": "2.8.0",
+    "typescript": "4.8.3",
+    "unplugin-auto-expose": "0.0.3",
+    "vite": "3.1.2",
+    "vitest": "0.23.4",
+    "vue-tsc": "0.40.13"
+  },
+  "dependencies": {
+    "electron-updater": "5.2.1",
+    "vue": "3.2.39"
+  }
+}
