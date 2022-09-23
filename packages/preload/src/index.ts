@@ -1,6 +1,15 @@
 /**
  * @module preload
  */
+import type {Collection} from '../../renderer/src/model';
 
-export {sha256sum} from './nodeCrypto';
 export {versions} from './versions';
+const {ipcRenderer} = require('electron');
+
+export function openXML(): Promise<{xml: Collection, path: string}> {
+  return ipcRenderer.invoke('dialog:openFile');
+}
+
+export function downloadPlaylist(content: string): Promise<string | undefined> {
+  return ipcRenderer.invoke('downloadPlaylist', content);
+}
