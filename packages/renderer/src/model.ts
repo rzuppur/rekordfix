@@ -72,7 +72,7 @@ export interface Collection {
           Entries: string;
         };
         TRACK: Track[];
-      }
+      },
     ];
     PLAYLISTS: [
       {
@@ -84,9 +84,9 @@ export interface Collection {
               Count: 'string';
             };
             NODE: (Playlist | Folder)[];
-          }
+          },
         ];
-      }
+      },
     ];
     PRODUCT: [
       {
@@ -95,7 +95,7 @@ export interface Collection {
           Version: string;
           Company: string;
         };
-      }
+      },
     ];
   };
 }

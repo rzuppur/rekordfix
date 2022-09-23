@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-
 import {openXML, downloadPlaylist} from '#preload';
 import type {Ref} from 'vue';
-import { ref} from 'vue';
+import {ref} from 'vue';
 import type {Folder, Playlist, TrackData} from '/@/model';
-import { useToast } from '@rzuppur/rvc';
+import {useToast} from '@rzuppur/rvc';
 
 const toast = useToast();
 
@@ -31,10 +30,10 @@ const resetCollection = () => {
 
 const getTracks = (list: (Playlist | Folder)[]): string[] => {
   const result: string[] = [];
-  list.forEach((item) => {
+  list.forEach(item => {
     if (item.$.Type === '1') {
       if ((item as Playlist).TRACK) {
-        result.push(...((item as Playlist).TRACK.map(t => t.$.Key)));
+        result.push(...(item as Playlist).TRACK.map(t => t.$.Key));
       }
     } else if (item.$.Type === '0') {
       result.push(...getTracks((item as Folder).NODE));
@@ -45,14 +44,14 @@ const getTracks = (list: (Playlist | Folder)[]): string[] => {
 
 const actionOpenXML = async () => {
   collectionLoading.value = true;
-  const { xml: collection, path } = await openXML();
+  const {xml: collection, path} = await openXML();
   if (collection) {
     try {
       collectionTracks.value = collection.DJ_PLAYLISTS.COLLECTION[0].TRACK.map(t => t.$);
 
       const playlistTree = collection.DJ_PLAYLISTS.PLAYLISTS[0].NODE[0].NODE;
       collectionTracksInPlaylistsKeys.value = new Set(getTracks(playlistTree));
-      collectionTracksNotInPlaylists.value = collectionTracks.value.filter((track) => {
+      collectionTracksNotInPlaylists.value = collectionTracks.value.filter(track => {
         return !collectionTracksInPlaylistsKeys.value.has(track.TrackID);
       });
 
@@ -74,7 +73,7 @@ const actionOpenXML = async () => {
 const actionSaveLostPlaylist = async () => {
   playlistSaving.value = true;
   let m3u8 = '#EXTM3U\n';
-  collectionTracksNotInPlaylists.value.forEach((track) => {
+  collectionTracksNotInPlaylists.value.forEach(track => {
     m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
     m3u8 += `${decodeURI(track.Location).replaceAll('%26', '&')}\n`;
   });
@@ -82,7 +81,6 @@ const actionSaveLostPlaylist = async () => {
   if (path) toast(`✔ Playlist saved to ${path}`);
   playlistSaving.value = false;
 };
-
 </script>
 <template lang="pug">
 
@@ -175,5 +173,4 @@ em,
 dfn
   font-style normal
   font-variation-settings "slnt" -10
-
 </style>
