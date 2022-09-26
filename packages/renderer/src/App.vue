@@ -66,12 +66,12 @@ const actionOpenXML = async () => {
 
       const trackNames: Map<string, TrackData> = new Map();
       for (const track of collectionTracks.value) {
-          const name = `${track.Artist} - ${track.Name}`;
-          if (trackNames.has(name)) {
-            collectionTracksProbableDuplicates.value.push([track, trackNames.get(name) as TrackData]);
-          } else {
-              trackNames.set(name, track);
-          }
+        const name = `${track.Artist} - ${track.Name}`;
+        if (trackNames.has(name)) {
+          collectionTracksProbableDuplicates.value.push([track, trackNames.get(name) as TrackData]);
+        } else {
+          trackNames.set(name, track);
+        }
       }
 
       for (const playlist of collectionPlaylists.value) {
@@ -133,7 +133,6 @@ const actionSaveDuplicatePlaylist = async () => {
   if (path) toast(`✔ Playlist saved to ${path}`);
   playlistSaving.value = false;
 };
-
 </script>
 <template lang="pug">
 
