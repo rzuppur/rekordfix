@@ -67,7 +67,9 @@ const actionOpenXML = async () => {
         for (const [trackPosition, trackKey] of playlist.TRACK.map(t => t.$.Key).entries()) {
           if (trackKeys.has(trackKey)) {
             const track = collectionTracks.value.find(t => t.TrackID === trackKey);
-            duplicates.push(track ? `${trackPosition + 1}. ${track.Artist} - ${track.Name}` : trackKey);
+            duplicates.push(
+              track ? `${trackPosition + 1}. ${track.Artist} - ${track.Name}` : trackKey,
+            );
           } else {
             trackKeys.add(trackKey);
           }
