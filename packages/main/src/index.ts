@@ -88,12 +88,13 @@ async function handleFileOpen(event: IpcMainInvokeEvent) {
 async function handlePlaylistSave(
   event: IpcMainInvokeEvent,
   content: string,
+  filename: string,
 ): Promise<string | undefined> {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) return;
   const {filePath} = await dialog.showSaveDialog(browserWindow, {
     title: 'Save playlist',
-    defaultPath: 'lost_tracks',
+    defaultPath: filename,
     buttonLabel: 'Save',
     filters: [{name: 'm3u8', extensions: ['m3u8']}],
   });

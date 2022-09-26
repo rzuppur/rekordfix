@@ -4,6 +4,7 @@ import type {Ref} from 'vue';
 import {ref} from 'vue';
 import type {Folder, Playlist, TrackData} from '/@/model';
 import {useToast} from '@rzuppur/rvc';
+import {cleanLocationString, formatSeconds} from '/@/utils';
 
 const toast = useToast();
 
@@ -17,6 +18,7 @@ const playlistSaving = ref(false);
 const collectionTracks: Ref<TrackData[]> = ref([]);
 const collectionPlaylists: Ref<Playlist[]> = ref([]);
 const collectionTracksNotInPlaylists: Ref<TrackData[]> = ref([]);
+const collectionTracksProbableDuplicates: Ref<TrackData[][]> = ref([]);
 const collectionTracksInPlaylistsKeys: Ref<Set<string>> = ref(new Set());
 const collectionPlaylistDuplicates: Ref<Map<string, string[]>> = ref(new Map());
 const collectionFilePath: Ref<string> = ref('');
@@ -27,6 +29,7 @@ const resetCollection = () => {
   collectionTracks.value = [];
   collectionPlaylists.value = [];
   collectionTracksNotInPlaylists.value = [];
+  collectionTracksProbableDuplicates.value = [];
   collectionTracksInPlaylistsKeys.value = new Set();
   collectionPlaylistDuplicates.value = new Map();
   collectionFilePath.value = '';
@@ -60,6 +63,16 @@ const actionOpenXML = async () => {
       collectionTracksNotInPlaylists.value = collectionTracks.value.filter(track => {
         return !collectionTracksInPlaylistsKeys.value.has(track.TrackID);
       });
+
+      const trackNames: Map<string, TrackData> = new Map();
+      for (const track of collectionTracks.value) {
+          const name = `${track.Artist} - ${track.Name}`;
+          if (trackNames.has(name)) {
+            collectionTracksProbableDuplicates.value.push([track, trackNames.get(name) as TrackData]);
+          } else {
+              trackNames.set(name, track);
+          }
+      }
 
       for (const playlist of collectionPlaylists.value) {
         const duplicates = [];
@@ -99,12 +112,28 @@ const actionSaveLostPlaylist = async () => {
   let m3u8 = '#EXTM3U\n';
   collectionTracksNotInPlaylists.value.forEach(track => {
     m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
-    m3u8 += `${decodeURI(track.Location).replaceAll('%26', '&')}\n`;
+    m3u8 += `${cleanLocationString(track.Location)}\n`;
   });
-  const path = await downloadPlaylist(m3u8);
+  const path = await downloadPlaylist(m3u8, 'lost_tracks');
   if (path) toast(`✔ Playlist saved to ${path}`);
   playlistSaving.value = false;
 };
+
+const actionSaveDuplicatePlaylist = async () => {
+  playlistSaving.value = true;
+  let m3u8 = '#EXTM3U\n';
+  for (const duplicateTracks of collectionTracksProbableDuplicates.value) {
+    for (const track of duplicateTracks) {
+      m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
+      m3u8 += `${cleanLocationString(track.Location)}\n`;
+    }
+  }
+
+  const path = await downloadPlaylist(m3u8, 'duplicate_tracks');
+  if (path) toast(`✔ Playlist saved to ${path}`);
+  playlistSaving.value = false;
+};
+
 </script>
 <template lang="pug">
 
@@ -117,6 +146,7 @@ const actionSaveLostPlaylist = async () => {
     .background-error.r-p-md.r-border-radius-md.r-text-color-red.r-text-medium.r-space(v-if="errorText") {{ errorText }}
 
   .r-p-lg(v-else)
+    r-button.r-m-b-md(gray borderless small :action="resetCollection" icon="arrow left" icon-color="blue") Back
     .r-text-sm.r-text-medium {{ collectionFilePath }}
     .r-text-xxs.r-text-color-muted {{ collectionTracks.length }} tracks &middot; {{ collectionPlaylists.length }} playlists
 
@@ -136,6 +166,22 @@ const actionSaveLostPlaylist = async () => {
     .r-m-t-md.r-text-color-muted(v-else)
       r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
       | No duplicates in playlists
+
+    .r-m-t-md(v-if="collectionTracksProbableDuplicates.length")
+      h2.r-text-md.r-text-medium ⚠ {{ collectionTracksProbableDuplicates.length }} probable duplicate tracks
+      .r-text-color-muted.r-m-t-xs You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can delete one of the files from collection.
+      .r-buttons.r-m-t-md.r-m-b-md
+        r-button(:action="actionSaveDuplicatePlaylist" :loading="playlistSaving" icon="download") Export tracks
+        r-button(:action="() => { $refs.duplicatesModal.open(); }") View list
+        r-modal(ref="duplicatesModal" size="fill" title="Duplicate tracks" :buttons="false")
+          .r-m-t-sm(v-for="tracks in collectionTracksProbableDuplicates")
+            .r-text-bold {{ tracks[0].Artist }} - {{ tracks[0].Name }}
+            .r-text-xxs.r-ellipsis(v-for="track in tracks")
+              span.r-text-medium {{ formatSeconds(track.TotalTime) }}
+              code.r-text-color-muted &nbsp;{{ track.BitRate }}Kbps {{ track.DateAdded }} {{ cleanLocationString(track.Location).replace("file://localhost/", "") }}
+    .r-m-t-md.r-text-color-muted(v-else)
+      r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
+      | No duplicates in collection
 
 </template>
 <style lang="stylus">

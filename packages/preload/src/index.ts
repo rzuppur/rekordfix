@@ -10,6 +10,6 @@ export function openXML(): Promise<{xml: Collection; path: string}> {
   return ipcRenderer.invoke('dialog:openFile');
 }
 
-export function downloadPlaylist(content: string): Promise<string | undefined> {
-  return ipcRenderer.invoke('downloadPlaylist', content);
+export function downloadPlaylist(content: string, filename: string): Promise<string | undefined> {
+  return ipcRenderer.invoke('downloadPlaylist', content, filename);
 }
