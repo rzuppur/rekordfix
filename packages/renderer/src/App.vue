@@ -22,6 +22,7 @@ const collectionTracksProbableDuplicates: Ref<TrackData[][]> = ref([]);
 const collectionTracksInPlaylistsKeys: Ref<Set<string>> = ref(new Set());
 const collectionPlaylistDuplicates: Ref<Map<string, string[]>> = ref(new Map());
 const collectionFilePath: Ref<string> = ref('');
+const collectionVersion: Ref<string> = ref('');
 
 const resetCollection = () => {
   collectionLoading.value = false;
@@ -33,6 +34,7 @@ const resetCollection = () => {
   collectionTracksInPlaylistsKeys.value = new Set();
   collectionPlaylistDuplicates.value = new Map();
   collectionFilePath.value = '';
+  collectionVersion.value = '';
 };
 
 const getTracks = (list: (Playlist | Folder)[]): string[] => {
@@ -56,6 +58,7 @@ const actionOpenXML = async () => {
   const {xml: collection, path} = await openXML();
   if (collection) {
     try {
+      collectionVersion.value = collection.DJ_PLAYLISTS.PRODUCT[0].$.Version;
       collectionTracks.value = collection.DJ_PLAYLISTS.COLLECTION[0].TRACK.map(t => t.$);
 
       const playlistTree = collection.DJ_PLAYLISTS.PLAYLISTS[0].NODE[0].NODE;
@@ -99,6 +102,7 @@ const actionOpenXML = async () => {
       collectionFilePath.value = path;
     } catch (e) {
       console.error(e);
+      toast('❌ ' + e);
       errorText.value = 'Error reading the file, make sure you followed the instructions above.';
       resetCollection();
     }
@@ -137,7 +141,7 @@ const actionSaveDuplicatePlaylist = async () => {
 </script>
 <template lang="pug">
 
-.r-text-xs.r-p-t-md.r-p-b-xl.r-background-raised
+.r-text-xs.r-p-b-lg.r-background-raised
   .r-p-lg(v-if="!collectionLoaded")
     p Go to Rekordbox and select #{""}
       b File > Export Collection in xml format
@@ -146,41 +150,58 @@ const actionSaveDuplicatePlaylist = async () => {
     .background-error.r-p-md.r-border-radius-md.r-text-color-red.r-text-medium.r-space(v-if="errorText") {{ errorText }}
 
   .r-p-lg(v-else)
-    r-button.r-m-b-md(gray borderless small :action="resetCollection" icon="arrow left" icon-color="blue") Back
+    r-button.r-m-b-md(borderless small :action="resetCollection" icon="arrow left" icon-color="blue") Back
     .r-text-sm.r-text-medium {{ collectionFilePath }}
-    .r-text-xxs.r-text-color-muted {{ collectionTracks.length }} tracks &middot; {{ collectionPlaylists.length }} playlists
+    .r-text-xxs.r-text-color-muted Rekordbox version {{ collectionVersion }} &middot; {{ collectionTracks.length }} tracks &middot;&nbsp;
+      a(@click="() => { $refs.playlistsModal.open(); }") {{ collectionPlaylists.length }} playlists
+    .r-text-xxs.r-text-color-muted Last track added: "{{ collectionTracks.slice(-1)[0].Name }}" on {{ collectionTracks.slice(-1)[0].DateAdded }}
 
-    .r-m-t-md(v-if="collectionTracksNotInPlaylists.length")
-      h2.r-text-md.r-text-medium ⚠ {{ collectionTracksNotInPlaylists.length }} lost track{{ collectionTracksNotInPlaylists.length ===! 1 ? "s" : "" }}
+    r-modal(ref="playlistsModal" size="fill" title="All playlists" :buttons="false")
+      .r-m-t-xs(v-for="playlist in collectionPlaylists.sort((a, b) => a.$.Name.localeCompare(b.$.Name))")
+        .r-flex-container
+          .r-flex-1.ellipsis.r-text-medium {{ playlist.$.Name }}
+          .r-flex-0.r-text-xxs
+            template(v-if="playlist.TRACK") {{ playlist.TRACK.length }} track{{ playlist.TRACK.length === 1 ? "" : "s" }}
+            template(v-else) empty
+        hr
+
+    .r-m-t-lg(v-if="collectionTracksNotInPlaylists.length")
+      h2.r-text-md.r-text-medium
+        r-icon.red.r-m-r-sm(icon="attention")
+        | {{ collectionTracksNotInPlaylists.length }} lost track{{ collectionTracksNotInPlaylists.length === 1 ? "" : "s" }}
       .r-text-color-muted.r-m-t-xs These tracks are in collection but weren't found in any playlist. You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can either add them to a playlist or delete from collection.
-      r-button.r-m-t-md.r-m-b-md(:action="actionSaveLostPlaylist" :loading="playlistSaving" icon="download") Export tracks
-    .r-m-t-md.r-text-color-muted(v-else)
-      r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
+      r-button.r-m-t-md(primary :action="actionSaveLostPlaylist" :loading="playlistSaving" icon="download") Export tracks
+    h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
+      r-icon.green.r-m-r-sm(icon="check")
       | All collection tracks are in playlists
 
-    .r-m-t-md(v-if="collectionPlaylistDuplicates.size")
-      h2.r-text-md.r-text-medium ⚠ {{ collectionPlaylistDuplicates.size }} playlist{{ collectionPlaylistDuplicates.size ===! 1 ? "s" : "" }} has duplicate tracks
+    .r-m-t-lg(v-if="collectionPlaylistDuplicates.size")
+      h2.r-text-md.r-text-medium
+        r-icon.red.r-m-r-sm(icon="attention")
+        | {{ collectionPlaylistDuplicates.size }} playlist{{ collectionPlaylistDuplicates.size === 1 ? " has" : "s have" }} duplicate tracks
       .r-m-t-sm(v-for="playlist in collectionPlaylistDuplicates")
         .r-text-medium {{ playlist[0] }}
         .r-text-color-muted(v-for="track in playlist[1]") &bullet; {{ track }}
-    .r-m-t-md.r-text-color-muted(v-else)
-      r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
+    h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
+      r-icon.green.r-m-r-sm(icon="check")
       | No duplicates in playlists
 
-    .r-m-t-md(v-if="collectionTracksProbableDuplicates.length")
-      h2.r-text-md.r-text-medium ⚠ {{ collectionTracksProbableDuplicates.length }} probable duplicate tracks
+    .r-m-t-lg(v-if="collectionTracksProbableDuplicates.length")
+      h2.r-text-md.r-text-medium
+        r-icon.red.r-m-r-sm(icon="attention")
+        | {{ collectionTracksProbableDuplicates.length }} probable duplicate tracks
       .r-text-color-muted.r-m-t-xs You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can delete one of the files from collection.
       .r-buttons.r-m-t-md.r-m-b-md
-        r-button(:action="actionSaveDuplicatePlaylist" :loading="playlistSaving" icon="download") Export tracks
-        r-button(:action="() => { $refs.duplicatesModal.open(); }") View list
+        r-button(primary :action="actionSaveDuplicatePlaylist" :loading="playlistSaving" icon="download") Export tracks
+        r-button(gray borderless :action="() => { $refs.duplicatesModal.open(); }") View list
         r-modal(ref="duplicatesModal" size="fill" title="Duplicate tracks" :buttons="false")
           .r-m-t-sm(v-for="tracks in collectionTracksProbableDuplicates")
             .r-text-bold {{ tracks[0].Artist }} - {{ tracks[0].Name }}
             .r-text-xxs.r-ellipsis(v-for="track in tracks")
               span.r-text-medium {{ formatSeconds(track.TotalTime) }}
-              code.r-text-color-muted &nbsp;{{ track.BitRate }}Kbps {{ track.DateAdded }} {{ cleanLocationString(track.Location).replace("file://localhost/", "") }}
-    .r-m-t-md.r-text-color-muted(v-else)
-      r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
+              span.r-text-color-muted &nbsp;{{ cleanLocationString(track.Location).replace("file://localhost/", "") }}
+    h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
+      r-icon.green.r-m-r-sm(icon="check")
       | No duplicates in collection
 
 </template>
