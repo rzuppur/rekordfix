@@ -15,16 +15,20 @@ const playlistSaving = ref(false);
 
 // DATA
 const collectionTracks: Ref<TrackData[]> = ref([]);
+const collectionPlaylists: Ref<Playlist[]> = ref([]);
 const collectionTracksNotInPlaylists: Ref<TrackData[]> = ref([]);
 const collectionTracksInPlaylistsKeys: Ref<Set<string>> = ref(new Set());
+const collectionPlaylistDuplicates: Ref<Map<string, string[]>> = ref(new Map());
 const collectionFilePath: Ref<string> = ref('');
 
 const resetCollection = () => {
   collectionLoading.value = false;
   collectionLoaded.value = false;
   collectionTracks.value = [];
+  collectionPlaylists.value = [];
   collectionTracksNotInPlaylists.value = [];
   collectionTracksInPlaylistsKeys.value = new Set();
+  collectionPlaylistDuplicates.value = new Map();
   collectionFilePath.value = '';
 };
 
@@ -32,8 +36,10 @@ const getTracks = (list: (Playlist | Folder)[]): string[] => {
   const result: string[] = [];
   list.forEach(item => {
     if (item.$.Type === '1') {
-      if ((item as Playlist).TRACK) {
-        result.push(...(item as Playlist).TRACK.map(t => t.$.Key));
+      const playlist = item as Playlist;
+      collectionPlaylists.value.push(playlist);
+      if (playlist.TRACK) {
+        result.push(...playlist.TRACK.map(t => t.$.Key));
       }
     } else if (item.$.Type === '0') {
       result.push(...getTracks((item as Folder).NODE));
@@ -54,6 +60,22 @@ const actionOpenXML = async () => {
       collectionTracksNotInPlaylists.value = collectionTracks.value.filter(track => {
         return !collectionTracksInPlaylistsKeys.value.has(track.TrackID);
       });
+
+      for (const playlist of collectionPlaylists.value) {
+        const duplicates = [];
+        const trackKeys = new Set();
+        for (const [trackPosition, trackKey] of playlist.TRACK.map(t => t.$.Key).entries()) {
+          if (trackKeys.has(trackKey)) {
+            const track = collectionTracks.value.find(t => t.TrackID === trackKey);
+            duplicates.push(track ? `${trackPosition + 1}. ${track.Artist} - ${track.Name}` : trackKey);
+          } else {
+            trackKeys.add(trackKey);
+          }
+        }
+        if (duplicates.length) {
+          collectionPlaylistDuplicates.value.set(playlist.$.Name, duplicates);
+        }
+      }
 
       collectionLoading.value = false;
       collectionLoaded.value = true;
@@ -86,7 +108,6 @@ const actionSaveLostPlaylist = async () => {
 
 .r-text-xs.r-p-t-md.r-p-b-xl.r-background-raised
   .r-p-lg(v-if="!collectionLoaded")
-    h1.r-text-xs.r-text-medium.r-text-color-muted.r-space REKORDFIX
     p Go to Rekordbox and select #{""}
       b File > Export Collection in xml format
       | . Then find the file you just exported and open it here.
@@ -94,17 +115,25 @@ const actionSaveLostPlaylist = async () => {
     .background-error.r-p-md.r-border-radius-md.r-text-color-red.r-text-medium.r-space(v-if="errorText") {{ errorText }}
 
   .r-p-lg(v-else)
-    .r-text-xxs.r-text-color-muted.r-space
-      b {{ collectionFilePath }}
-      br
-      | {{ collectionTracks.length }} tracks in collection
-      br
-      | {{ collectionTracksInPlaylistsKeys.size }} tracks in playlists
+    .r-text-sm.r-text-medium {{ collectionFilePath }}
+    .r-text-xxs.r-text-color-muted {{ collectionTracks.length }} tracks &middot; {{ collectionPlaylists.length }} playlists
 
     .r-m-t-md(v-if="collectionTracksNotInPlaylists.length")
-      h2.r-text-md.r-text-medium ⚠ {{ collectionTracksNotInPlaylists.length }} lost tracks
-      .r-text-color-muted.r-m-t-xs These tracks are in collection but weren't found in any playlist. You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can either add them to playlists or delete from collection.
-      r-button.r-m-t-md(:action="actionSaveLostPlaylist" :loading="playlistSaving" icon="download") Export tracks
+      h2.r-text-md.r-text-medium ⚠ {{ collectionTracksNotInPlaylists.length }} lost track{{ collectionTracksNotInPlaylists.length ===! 1 ? "s" : "" }}
+      .r-text-color-muted.r-m-t-xs These tracks are in collection but weren't found in any playlist. You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can either add them to a playlist or delete from collection.
+      r-button.r-m-t-md.r-m-b-md(:action="actionSaveLostPlaylist" :loading="playlistSaving" icon="download") Export tracks
+    .r-m-t-md.r-text-color-muted(v-else)
+      r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
+      | All collection tracks are in playlists
+
+    .r-m-t-md(v-if="collectionPlaylistDuplicates.size")
+      h2.r-text-md.r-text-medium ⚠ {{ collectionPlaylistDuplicates.size }} playlist{{ collectionPlaylistDuplicates.size ===! 1 ? "s" : "" }} has duplicate tracks
+      .r-m-t-sm(v-for="playlist in collectionPlaylistDuplicates")
+        .r-text-medium {{ playlist[0] }}
+        .r-text-color-muted(v-for="track in playlist[1]") &bullet; {{ track }}
+    .r-m-t-md.r-text-color-muted(v-else)
+      r-icon.green.r-m-r-sm(icon="check" style="vertical-align: text-bottom;")
+      | No duplicates in playlists
 
 </template>
 <style lang="stylus">
