@@ -1,5 +1,8 @@
 on:
-  - push
+  push:
+    branches:
+      - main
+      - master
 
 concurrency:
   group: format-${{ github.ref }}
