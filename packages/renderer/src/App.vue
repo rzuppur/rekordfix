@@ -75,6 +75,7 @@ const actionOpenXML = async () => {
       }
 
       for (const playlist of collectionPlaylists.value) {
+        if (!playlist.TRACK || !playlist.TRACK.length) continue;
         const duplicates = [];
         const trackKeys = new Set();
         for (const [trackPosition, trackKey] of playlist.TRACK.map(t => t.$.Key).entries()) {
