@@ -1,7 +1,7 @@
 {
   "name": "rekordfix",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "main": "packages/main/dist/index.cjs",
   "scripts": {
     "build": "npm run build:main && npm run build:preload && npm run build:renderer",
@@ -19,7 +19,7 @@
     "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,vue,json}\""
   },
   "devDependencies": {
-    "@rzuppur/rvc": "^0.52.0",
+    "@rzuppur/rvc": "^0.53.0",
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "5.37.0",
     "@typescript-eslint/parser": "^5.38.0",

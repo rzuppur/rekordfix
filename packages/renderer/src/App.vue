@@ -5,6 +5,7 @@ import {ref} from 'vue';
 import type {Folder, Playlist, TrackData} from '/@/model';
 import {useToast} from '@rzuppur/rvc';
 import {cleanLocationString, formatSeconds} from '/@/utils';
+import PlaylistsView from '/@/components/PlaylistsView.vue';
 
 const toast = useToast();
 
@@ -153,17 +154,10 @@ const actionSaveDuplicatePlaylist = async () => {
     r-button.r-m-b-md(borderless small :action="resetCollection" icon="arrow left" icon-color="blue") Back
     .r-text-sm.r-text-medium {{ collectionFilePath }}
     .r-text-xxs.r-text-color-muted Rekordbox version {{ collectionVersion }} &middot; {{ collectionTracks.length }} tracks &middot;&nbsp;
-      a(@click="() => { $refs.playlistsModal.open(); }") {{ collectionPlaylists.length }} playlists
+      a(@click="() => { $refs.playlists.open(); }") {{ collectionPlaylists.length }} playlists
     .r-text-xxs.r-text-color-muted Last track added: "{{ collectionTracks.slice(-1)[0].Name }}" on {{ collectionTracks.slice(-1)[0].DateAdded }}
 
-    r-modal(ref="playlistsModal" size="fill" title="All playlists" :buttons="false")
-      .r-m-t-xs(v-for="playlist in collectionPlaylists.sort((a, b) => a.$.Name.localeCompare(b.$.Name))")
-        .r-flex-container
-          .r-flex-1.ellipsis.r-text-medium {{ playlist.$.Name }}
-          .r-flex-0.r-text-xxs
-            template(v-if="playlist.TRACK") {{ playlist.TRACK.length }} track{{ playlist.TRACK.length === 1 ? "" : "s" }}
-            template(v-else) empty
-        hr
+    PlaylistsView(ref="playlists" :collectionPlaylists="collectionPlaylists" :collectionTracks="collectionTracks")
 
     .r-m-t-lg(v-if="collectionTracksNotInPlaylists.length")
       h2.r-text-md.r-text-medium
