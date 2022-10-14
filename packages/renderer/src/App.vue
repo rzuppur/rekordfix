@@ -40,17 +40,19 @@ const resetCollection = () => {
 
 const getTracks = (list: (Playlist | Folder)[]): string[] => {
   const result: string[] = [];
-  list.forEach(item => {
-    if (item.$.Type === '1') {
-      const playlist = item as Playlist;
-      collectionPlaylists.value.push(playlist);
-      if (playlist.TRACK) {
-        result.push(...playlist.TRACK.map(t => t.$.Key));
+  if (list) {
+    list.forEach(item => {
+      if (item.$.Type === '1') {
+        const playlist = item as Playlist;
+        collectionPlaylists.value.push(playlist);
+        if (playlist.TRACK) {
+          result.push(...playlist.TRACK.map(t => t.$.Key));
+        }
+      } else if (item.$.Type === '0') {
+        result.push(...getTracks((item as Folder).NODE));
       }
-    } else if (item.$.Type === '0') {
-      result.push(...getTracks((item as Folder).NODE));
-    }
-  });
+    });
+  }
   return result;
 };
 
