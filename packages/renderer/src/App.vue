@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {openXML, downloadPlaylist} from '#preload';
+import {openXML, downloadPlaylist, getVersion} from '#preload';
 import type {Ref} from 'vue';
 import {ref} from 'vue';
 import type {Folder, Playlist, TrackData} from '/@/model';
@@ -144,6 +144,11 @@ const actionSaveDuplicatePlaylist = async () => {
   if (path) toast(`✔ Playlist saved to ${path}`);
   playlistSaving.value = false;
 };
+
+const version = ref('');
+(async () => {
+  version.value = await getVersion();
+})();
 </script>
 <template lang="pug">
 
@@ -202,6 +207,8 @@ const actionSaveDuplicatePlaylist = async () => {
     h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
       r-icon.green.r-m-r-sm(icon="check")
       | No duplicates in collection
+
+.r-text-color-muted.r-p-sm.r-text-xxs Rekordfix v{{ version }}
 
 </template>
 <style lang="stylus">

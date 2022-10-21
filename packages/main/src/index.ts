@@ -104,7 +104,12 @@ async function handlePlaylistSave(
   }
 }
 
+function handleVersion(): string {
+  return app.getVersion();
+}
+
 app.whenReady().then(() => {
   ipcMain.handle('dialog:openFile', handleFileOpen);
   ipcMain.handle('downloadPlaylist', handlePlaylistSave);
+  ipcMain.handle('get:version', handleVersion);
 });

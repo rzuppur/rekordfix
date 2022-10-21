@@ -13,3 +13,7 @@ export function openXML(): Promise<{xml: Collection; path: string; cancelled?: b
 export function downloadPlaylist(content: string, filename: string): Promise<string | undefined> {
   return ipcRenderer.invoke('downloadPlaylist', content, filename);
 }
+
+export function getVersion(): Promise<string> {
+  return ipcRenderer.invoke('get:version');
+}
