@@ -232,37 +232,37 @@ inter-variable()
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-cyrillic-ext.woff2") format("woff2-variations")
+  src url("fonts/inter-var-cyrillic-ext.woff2") format("woff2-variations")
   unicode-range $font-range-cyrillic-ext
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-cyrillic.woff2") format("woff2-variations")
+  src url("fonts/inter-var-cyrillic.woff2") format("woff2-variations")
   unicode-range: $font-range-cyrillic
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-greek-ext.woff2") format("woff2-variations")
+  src url("fonts/inter-var-greek-ext.woff2") format("woff2-variations")
   unicode-range $font-range-greek-ext
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-greek.woff2") format("woff2-variations")
+  src url("fonts/inter-var-greek.woff2") format("woff2-variations")
   unicode-range $font-range-greek
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-vietnamese.woff2") format("woff2-variations")
+  src url("fonts/inter-var-vietnamese.woff2") format("woff2-variations")
   unicode-range $font-range-vietnamese
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-latin-ext.woff2") format("woff2-variations")
+  src url("fonts/inter-var-latin-ext.woff2") format("woff2-variations")
   unicode-range $font-range-latin-ext
 
 @font-face
   inter-variable()
-  src url("assets/fonts/inter-var-latin.woff2") format("woff2-variations")
+  src url("fonts/inter-var-latin.woff2") format("woff2-variations")
   unicode-range $font-range-latin
 
 i,
