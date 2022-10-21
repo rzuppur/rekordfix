@@ -48,7 +48,8 @@ const getTracks = (list: (Playlist | Folder)[]): string[] => {
         result.push(...playlist.TRACK.map(t => t.$.Key));
       }
     } else if (item.$.Type === '0') {
-      result.push(...getTracks((item as Folder).NODE));
+      const list = (item as Folder).NODE;
+      if (list) result.push(...getTracks(list));
     }
   });
   return result;
