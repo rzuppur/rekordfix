@@ -62,7 +62,7 @@ async function handleFileOpen(event: IpcMainInvokeEvent) {
     filters: [{name: 'XML Files', extensions: ['xml']}],
   });
   if (canceled) {
-    return { xml: null, path: '', cancelled: true };
+    return {xml: null, path: '', cancelled: true};
   } else {
     const path = filePaths[0];
     const fileContents = await promises.readFile(path, 'utf-8');
