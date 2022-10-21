@@ -56,9 +56,13 @@ const getTracks = (list: (Playlist | Folder)[]): string[] => {
 
 const actionOpenXML = async () => {
   collectionLoading.value = true;
-  const {xml: collection, path} = await openXML();
-  if (collection) {
-    try {
+  try {
+    const {xml: collection, path, cancelled} = await openXML();
+    if (cancelled) {
+      resetCollection();
+      return;
+    }
+    if (collection) {
       collectionVersion.value = collection.DJ_PLAYLISTS.PRODUCT[0].$.Version;
       collectionTracks.value = collection.DJ_PLAYLISTS.COLLECTION[0].TRACK.map(t => t.$);
 
@@ -101,14 +105,14 @@ const actionOpenXML = async () => {
       collectionLoaded.value = true;
       errorText.value = '';
       collectionFilePath.value = path;
-    } catch (e) {
-      console.error(e);
-      toast('❌ ' + e);
-      errorText.value = 'Error reading the file, make sure you followed the instructions above.';
+    } else {
+      errorText.value = 'Something went wrong';
       resetCollection();
     }
-  } else {
-    errorText.value = 'Something went wrong';
+  } catch (e) {
+    console.error(e);
+    toast('❌ ' + e);
+    errorText.value = 'Error reading the file, make sure you followed the instructions above.';
     resetCollection();
   }
 };

@@ -6,7 +6,7 @@ import type {Collection} from '../../renderer/src/model';
 export {versions} from './versions';
 const {ipcRenderer} = require('electron');
 
-export function openXML(): Promise<{xml: Collection; path: string}> {
+export function openXML(): Promise<{xml: Collection; path: string, cancelled?: boolean}> {
   return ipcRenderer.invoke('dialog:openFile');
 }
 
