@@ -157,7 +157,7 @@ const version = ref('');
     p Go to Rekordbox and select #{""}
       b File > Export Collection in xml format
       | . Then find the file you just exported and open it here.
-    r-button.r-space(primary :loading="collectionLoading" icon="search file" :action="actionOpenXML") Open XML Collection File
+    r-button.r-space(primary :loading="collectionLoading" icon="file_open" :action="actionOpenXML") Open XML Collection File
     .background-error.r-p-md.r-border-radius-md.r-text-color-red.r-text-medium.r-space(v-if="errorText") {{ errorText }}
 
   .r-p-lg(v-else)
