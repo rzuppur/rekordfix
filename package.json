@@ -1,7 +1,7 @@
 {
   "name": "rekordfix",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "main": "packages/main/dist/index.cjs",
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,vue,json}\""
   },
   "devDependencies": {
-    "@rzuppur/rvc": "^0.53.0",
+    "@rzuppur/rvc": "^0.59.0",
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "5.37.0",
     "@typescript-eslint/parser": "^5.38.0",
