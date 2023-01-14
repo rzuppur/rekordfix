@@ -34,7 +34,7 @@ export interface PlaylistData {
   Entries: string;
   KeyType: string;
   Name: string;
-  Type: '1';
+  Type: "1";
 }
 
 export interface PlaylistTrackData {
@@ -53,7 +53,7 @@ export interface Playlist {
 export interface FolderData {
   Count: string;
   Name: string;
-  Type: '0';
+  Type: "0";
 }
 
 export interface Folder {
@@ -79,9 +79,9 @@ export interface Collection {
         NODE: [
           {
             $: {
-              Type: '0';
-              Name: 'ROOT';
-              Count: 'string';
+              Type: "0";
+              Name: "ROOT";
+              Count: "string";
             };
             NODE: (Playlist | Folder)[];
           },

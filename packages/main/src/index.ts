@@ -1,10 +1,10 @@
-import type {IpcMainInvokeEvent} from 'electron';
-import {app, ipcMain, dialog, BrowserWindow} from 'electron';
-import {promises} from 'fs';
-import {parseString} from 'xml2js';
-import './security-restrictions';
-import {restoreOrCreateWindow} from '/@/mainWindow';
-import type {Collection} from '../../renderer/src/model';
+import type {IpcMainInvokeEvent} from "electron";
+import {app, ipcMain, dialog, BrowserWindow} from "electron";
+import {promises} from "fs";
+import {parseString} from "xml2js";
+import "./security-restrictions";
+import {restoreOrCreateWindow} from "/@/mainWindow";
+import type {Collection} from "../../renderer/src/model";
 
 /**
  * Prevent electron from running multiple instances.
@@ -14,7 +14,7 @@ if (!isSingleInstance) {
   app.quit();
   process.exit(0);
 }
-app.on('second-instance', restoreOrCreateWindow);
+app.on("second-instance", restoreOrCreateWindow);
 
 /**
  * Disable Hardware Acceleration to save more system resources.
@@ -24,8 +24,8 @@ app.disableHardwareAcceleration();
 /**
  * Shout down background process if all windows was closed
  */
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 });
@@ -33,7 +33,7 @@ app.on('window-all-closed', () => {
 /**
  * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
  */
-app.on('activate', restoreOrCreateWindow);
+app.on("activate", restoreOrCreateWindow);
 
 /**
  * Create the application window when the background process is ready.
@@ -41,7 +41,7 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(restoreOrCreateWindow)
-  .catch(e => console.error('Failed create window:', e));
+  .catch(e => console.error("Failed create window:", e));
 
 /**
  * Check for new version of the application - production mode only.
@@ -49,23 +49,23 @@ app
 if (import.meta.env.PROD) {
   app
     .whenReady()
-    .then(() => import('electron-updater'))
+    .then(() => import("electron-updater"))
     .then(({autoUpdater}) => autoUpdater.checkForUpdatesAndNotify())
-    .catch(e => console.error('Failed check updates:', e));
+    .catch(e => console.error("Failed check updates:", e));
 }
 
 async function handleFileOpen(event: IpcMainInvokeEvent) {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) return;
   const {canceled, filePaths} = await dialog.showOpenDialog(browserWindow, {
-    properties: ['openFile'],
-    filters: [{name: 'XML Files', extensions: ['xml']}],
+    properties: ["openFile"],
+    filters: [{name: "XML Files", extensions: ["xml"]}],
   });
   if (canceled) {
-    return {xml: null, path: '', cancelled: true};
+    return {xml: null, path: "", cancelled: true};
   } else {
     const path = filePaths[0];
-    const fileContents = await promises.readFile(path, 'utf-8');
+    const fileContents = await promises.readFile(path, "utf-8");
     if (fileContents) {
       const xml = await new Promise((resolve, reject) => {
         parseString(fileContents, (err: Error | null, result?: Collection) => {
@@ -93,13 +93,13 @@ async function handlePlaylistSave(
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) return;
   const {filePath} = await dialog.showSaveDialog(browserWindow, {
-    title: 'Save playlist',
+    title: "Save playlist",
     defaultPath: filename,
-    buttonLabel: 'Save',
-    filters: [{name: 'm3u8', extensions: ['m3u8']}],
+    buttonLabel: "Save",
+    filters: [{name: "m3u8", extensions: ["m3u8"]}],
   });
   if (filePath) {
-    await promises.writeFile(filePath, content, 'utf-8');
+    await promises.writeFile(filePath, content, "utf-8");
     return filePath;
   }
 }
@@ -109,7 +109,7 @@ function handleVersion(): string {
 }
 
 app.whenReady().then(() => {
-  ipcMain.handle('dialog:openFile', handleFileOpen);
-  ipcMain.handle('downloadPlaylist', handlePlaylistSave);
-  ipcMain.handle('get:version', handleVersion);
+  ipcMain.handle("dialog:openFile", handleFileOpen);
+  ipcMain.handle("downloadPlaylist", handlePlaylistSave);
+  ipcMain.handle("get:version", handleVersion);
 });

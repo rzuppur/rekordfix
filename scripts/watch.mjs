@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-import {build, createServer} from 'vite';
-import electronPath from 'electron';
-import {spawn} from 'child_process';
+import {build, createServer} from "vite";
+import electronPath from "electron";
+import {spawn} from "child_process";
 
 /** @type 'production' | 'development'' */
-const mode = (process.env.MODE = process.env.MODE || 'development');
+const mode = (process.env.MODE = process.env.MODE || "development");
 
 /** @type {import('vite').LogLevel} */
-const logLevel = 'warn';
+const logLevel = "warn";
 
 /**
  * Setup watcher for `main` package
@@ -25,7 +25,7 @@ function setupMainPackageWatcher({resolvedUrls}) {
   return build({
     mode,
     logLevel,
-    configFile: 'packages/main/vite.config.js',
+    configFile: "packages/main/vite.config.js",
     build: {
       /**
        * Set to {} to enable rollup watcher
@@ -35,22 +35,22 @@ function setupMainPackageWatcher({resolvedUrls}) {
     },
     plugins: [
       {
-        name: 'reload-app-on-main-package-change',
+        name: "reload-app-on-main-package-change",
         writeBundle() {
           /** Kill electron if process already exist */
           if (electronApp !== null) {
-            electronApp.removeListener('exit', process.exit);
-            electronApp.kill('SIGINT');
+            electronApp.removeListener("exit", process.exit);
+            electronApp.kill("SIGINT");
             electronApp = null;
           }
 
           /** Spawn new electron process */
-          electronApp = spawn(String(electronPath), ['.'], {
-            stdio: 'inherit',
+          electronApp = spawn(String(electronPath), ["."], {
+            stdio: "inherit",
           });
 
           /** Stops the watch script when the application has been quit */
-          electronApp.addListener('exit', process.exit);
+          electronApp.addListener("exit", process.exit);
         },
       },
     ],
@@ -67,7 +67,7 @@ function setupPreloadPackageWatcher({ws}) {
   return build({
     mode,
     logLevel,
-    configFile: 'packages/preload/vite.config.js',
+    configFile: "packages/preload/vite.config.js",
     build: {
       /**
        * Set to {} to enable rollup watcher
@@ -77,10 +77,10 @@ function setupPreloadPackageWatcher({ws}) {
     },
     plugins: [
       {
-        name: 'reload-page-on-preload-package-change',
+        name: "reload-page-on-preload-package-change",
         writeBundle() {
           ws.send({
-            type: 'full-reload',
+            type: "full-reload",
           });
         },
       },
@@ -97,7 +97,7 @@ function setupPreloadPackageWatcher({ws}) {
 const rendererWatchServer = await createServer({
   mode,
   logLevel,
-  configFile: 'packages/renderer/vite.config.js',
+  configFile: "packages/renderer/vite.config.js",
 }).then(s => s.listen());
 
 await setupPreloadPackageWatcher(rendererWatchServer);

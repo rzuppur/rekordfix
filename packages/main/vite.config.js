@@ -1,5 +1,5 @@
-import {node} from '../../.electron-vendors.cache.json';
-import {join} from 'path';
+import {node} from "../../.electron-vendors.cache.json";
+import {join} from "path";
 
 const PACKAGE_ROOT = __dirname;
 
@@ -13,23 +13,23 @@ const config = {
   envDir: process.cwd(),
   resolve: {
     alias: {
-      '/@/': join(PACKAGE_ROOT, 'src') + '/',
+      "/@/": join(PACKAGE_ROOT, "src") + "/",
     },
   },
   build: {
     ssr: true,
-    sourcemap: 'inline',
+    sourcemap: "inline",
     target: `node${node}`,
-    outDir: 'dist',
-    assetsDir: '.',
-    minify: process.env.MODE !== 'development',
+    outDir: "dist",
+    assetsDir: ".",
+    minify: process.env.MODE !== "development",
     lib: {
-      entry: 'src/index.ts',
-      formats: ['cjs'],
+      entry: "src/index.ts",
+      formats: ["cjs"],
     },
     rollupOptions: {
       output: {
-        entryFileNames: '[name].cjs',
+        entryFileNames: "[name].cjs",
       },
     },
     emptyOutDir: true,
