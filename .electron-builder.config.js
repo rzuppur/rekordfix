@@ -11,16 +11,16 @@ if (process.env.VITE_APP_VERSION === undefined) {
  */
 const config = {
   directories: {
-    output: 'dist',
-    buildResources: 'buildResources',
+    output: "dist",
+    buildResources: "buildResources",
   },
-  files: ['packages/**/dist/**'],
+  files: ["packages/**/dist/**"],
   extraMetadata: {
     version: process.env.VITE_APP_VERSION,
   },
   linux: {
-    target: ['AppImage'],
-    category: 'AudioVideo',
+    target: ["AppImage"],
+    category: "AudioVideo",
   },
 };
 

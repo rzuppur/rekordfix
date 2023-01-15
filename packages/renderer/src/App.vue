@@ -76,13 +76,11 @@ const actionOpenCollection = async () => {
 
     collectionLoaded.value = true;
     errorText.value = "";
-
   } catch (e) {
     console.error(e);
     toast("❌ " + e);
     errorText.value = "Error reading the file, make sure you followed the instructions above.";
     resetCollection();
-
   } finally {
     collectionLoading.value = false;
   }

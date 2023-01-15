@@ -6,13 +6,13 @@ import {parseXML} from "../file/xml";
 
 export type CollectionParseResultError = {error: string};
 export type CollectionParseResultSuccess = {
-  version: string,
-  tracks: TrackData[],
-  tracksInPlaylistsKeys: Set<string>,
-  tracksNotInPlaylists: TrackData[],
-  tracksProbableDuplicates: TrackData[][],
+  version: string;
+  tracks: TrackData[];
+  tracksInPlaylistsKeys: Set<string>;
+  tracksNotInPlaylists: TrackData[];
+  tracksProbableDuplicates: TrackData[][];
   playlistDuplicates: Map<string, string[]>;
-  path: string,
+  path: string;
 };
 export type CollectionParseResult = CollectionParseResultError | CollectionParseResultSuccess;
 
@@ -48,7 +48,10 @@ function getTracks(list: (Playlist | Folder)[]): string[] {
   return result;
 }
 
-export async function parseCollectionXML(contents: string, path: string): Promise<CollectionParseResult> {
+export async function parseCollectionXML(
+  contents: string,
+  path: string,
+): Promise<CollectionParseResult> {
   try {
     const collection = await parseXML<Collection>(contents);
     if (!collection) return {error: "Could not parse XML"};
