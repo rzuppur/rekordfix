@@ -1,10 +1,12 @@
 import type {IpcMainInvokeEvent} from "electron";
+import type {CollectionParseResult} from "/@/rekordbox/collection";
+
 import {app, ipcMain, dialog, BrowserWindow} from "electron";
 import {promises} from "fs";
-import {parseString} from "xml2js";
 import "./security-restrictions";
 import {restoreOrCreateWindow} from "/@/mainWindow";
-import type {Collection} from "../../renderer/src/model";
+import {readFileAsUtf8FromDialog} from "/@/file/read";
+import {parseCollectionXML} from "/@/rekordbox/collection";
 
 /**
  * Prevent electron from running multiple instances.
@@ -54,34 +56,13 @@ if (import.meta.env.PROD) {
     .catch(e => console.error("Failed check updates:", e));
 }
 
-async function handleFileOpen(event: IpcMainInvokeEvent) {
-  const browserWindow = BrowserWindow.fromWebContents(event.sender);
-  if (!browserWindow) return;
-  const {canceled, filePaths} = await dialog.showOpenDialog(browserWindow, {
-    properties: ["openFile"],
-    filters: [{name: "XML Files", extensions: ["xml"]}],
-  });
-  if (canceled) {
-    return {xml: null, path: "", cancelled: true};
+async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<CollectionParseResult> {
+  const result = await readFileAsUtf8FromDialog(event.sender, "xml");
+  if ("contents" in result) {
+    return parseCollectionXML(result.contents, result.path);
   } else {
-    const path = filePaths[0];
-    const fileContents = await promises.readFile(path, "utf-8");
-    if (fileContents) {
-      const xml = await new Promise((resolve, reject) => {
-        parseString(fileContents, (err: Error | null, result?: Collection) => {
-          if (!err && result) {
-            resolve(result);
-          } else {
-            reject(err);
-          }
-        });
-      });
-
-      return {
-        xml,
-        path,
-      };
-    }
+    if ("error" in result) return {error: result.error};
+    return {error: "cancelled"};
   }
 }
 
@@ -109,7 +90,7 @@ function handleVersion(): string {
 }
 
 app.whenReady().then(() => {
-  ipcMain.handle("dialog:openFile", handleFileOpen);
+  ipcMain.handle("dialog:collectionOpen", handleCollectionOpen);
   ipcMain.handle("downloadPlaylist", handlePlaylistSave);
   ipcMain.handle("get:version", handleVersion);
 });

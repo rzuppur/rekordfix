@@ -1,13 +1,13 @@
 /**
  * @module preload
  */
-import type {Collection} from "../../renderer/src/model";
+import type {CollectionParseResult} from "../../main/src/rekordbox/collection";
 
 export {versions} from "./versions";
 const {ipcRenderer} = require("electron");
 
-export function openXML(): Promise<{xml: Collection; path: string; cancelled?: boolean}> {
-  return ipcRenderer.invoke("dialog:openFile");
+export function collectionOpen(): Promise<CollectionParseResult> {
+  return ipcRenderer.invoke("dialog:collectionOpen");
 }
 
 export function downloadPlaylist(content: string, filename: string): Promise<string | undefined> {

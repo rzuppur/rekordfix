@@ -42,18 +42,18 @@ defineExpose({
 </script>
 <template lang="pug">
 
-  r-modal(ref="playlistsModalRef" size="fill" title="All playlists" :buttons="false")
-    .r-m-t-xs(v-for="playlist in collectionPlaylists.sort((a, b) => a.$.Name.localeCompare(b.$.Name))")
-      .r-flex-container
-        .r-flex-1.ellipsis.r-text-medium(@click="() => { openPlaylist(playlist); }") {{ playlist.$.Name }}
-        .r-flex-0.r-text-xxs
-          template(v-if="playlist.TRACK") {{ playlist.TRACK.length }} track{{ playlist.TRACK.length === 1 ? '' : 's' }}
-          template(v-else) empty
-      hr
+r-modal(ref="playlistsModalRef" size="fill" title="All playlists" :buttons="false")
+  .r-m-t-xs(v-for="playlist in collectionPlaylists.sort((a, b) => a.$.Name.localeCompare(b.$.Name))")
+    .r-flex-container
+      .r-flex-1.ellipsis.r-text-medium(@click="() => { openPlaylist(playlist); }") {{ playlist.$.Name }}
+      .r-flex-0.r-text-xxs
+        template(v-if="playlist.TRACK") {{ playlist.TRACK.length }} track{{ playlist.TRACK.length === 1 ? '' : 's' }}
+        template(v-else) empty
+    hr
 
-  r-modal(ref="playlistDetailModalRef" size="fill" :title="playlistTitle" :buttons="false")
-    .r-m-t-xs(v-for="tracks in playlistTracks")
-      span.r-text-bold {{ tracks.Artist }}
-      span.r-text-medium &nbsp;- {{ tracks.Name }}
+r-modal(ref="playlistDetailModalRef" size="fill" :title="playlistTitle" :buttons="false")
+  .r-m-t-xs(v-for="tracks in playlistTracks")
+    span.r-text-bold {{ tracks.Artist }}
+    span.r-text-medium &nbsp;- {{ tracks.Name }}
 
 </template>
