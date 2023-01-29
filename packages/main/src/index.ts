@@ -7,7 +7,7 @@ import "./security-restrictions";
 import {restoreOrCreateWindow} from "/@/mainWindow";
 import {readFileAsUtf8FromDialog} from "/@/file/read";
 import {parseCollectionXML} from "/@/rekordbox/collection";
-import {version} from "../../../package.json" assert { type: "json" };
+import {version} from "../../../package.json" assert {type: "json"};
 
 /**
  * Prevent electron from running multiple instances.
