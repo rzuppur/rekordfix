@@ -38,23 +38,6 @@ const resetCollection = () => {
   collectionVersion.value = "";
 };
 
-const getTracks = (list: (Playlist | Folder)[]): string[] => {
-  const result: string[] = [];
-  list.forEach(item => {
-    if (item.$.Type === "1") {
-      const playlist = item as Playlist;
-      collectionPlaylists.value.push(playlist);
-      if (playlist.TRACK) {
-        result.push(...playlist.TRACK.map(t => t.$.Key));
-      }
-    } else if (item.$.Type === "0") {
-      const list = (item as Folder).NODE;
-      if (list) result.push(...getTracks(list));
-    }
-  });
-  return result;
-};
-
 const actionOpenCollection = async () => {
   collectionLoading.value = true;
 
@@ -68,6 +51,7 @@ const actionOpenCollection = async () => {
 
     collectionVersion.value = collection.version;
     collectionTracks.value = collection.tracks;
+    collectionPlaylists.value = collection.playlists;
     collectionFilePath.value = collection.path;
     collectionTracksInPlaylistsKeys.value = collection.tracksInPlaylistsKeys;
     collectionTracksNotInPlaylists.value = collection.tracksNotInPlaylists;

@@ -8,6 +8,7 @@ export type CollectionParseResultError = {error: string};
 export type CollectionParseResultSuccess = {
   version: string;
   tracks: TrackData[];
+  playlists: Playlist[];
   tracksInPlaylistsKeys: Set<string>;
   tracksNotInPlaylists: TrackData[];
   tracksProbableDuplicates: TrackData[][];
@@ -16,17 +17,20 @@ export type CollectionParseResultSuccess = {
 };
 export type CollectionParseResult = CollectionParseResultError | CollectionParseResultSuccess;
 
-function getPlaylists(list: (Playlist | Folder)[]): Playlist[] {
+function getPlaylists(list: (Playlist | Folder)[], folderPrefix?: string): Playlist[] {
   const result: Playlist[] = [];
   list.forEach(item => {
     if (item.$.Type === "1") {
-      result.push(item as Playlist);
+      const playlist = item as Playlist;
+      if (folderPrefix) playlist.$.Name = `${folderPrefix} > ${playlist.$.Name}`;
+      result.push(playlist);
     } else if (item.$.Type === "0") {
       const list = (item as Folder).NODE;
-      if (list) result.push(...getPlaylists(list));
+      let folderPath = item.$.Name;
+      if (folderPrefix) folderPath = `${folderPrefix} > ${folderPath}`;
+      if (list) result.push(...getPlaylists(list, folderPath));
     }
   });
-  console.log(result);
 
   return result;
 }
@@ -93,6 +97,7 @@ export async function parseCollectionXML(
     return {
       version: collection.DJ_PLAYLISTS.PRODUCT[0].$.Version,
       tracks,
+      playlists,
       tracksInPlaylistsKeys,
       tracksNotInPlaylists: tracks.filter(track => !tracksInPlaylistsKeys.has(track.TrackID)),
       tracksProbableDuplicates,
