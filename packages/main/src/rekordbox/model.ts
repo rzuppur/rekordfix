@@ -99,3 +99,14 @@ export interface Collection {
     ];
   };
 }
+
+export interface ParsedCollectionData {
+  version: string;
+  tracks: TrackData[];
+  playlists: Playlist[];
+  tracksInPlaylistsKeys: Set<string>;
+  tracksNotInPlaylists: TrackData[];
+  tracksProbableDuplicates: TrackData[][];
+  playlistDuplicates: Map<string, string[]>;
+  path: string;
+}

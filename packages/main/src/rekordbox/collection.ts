@@ -1,21 +1,11 @@
-import type {Collection} from "../../../renderer/src/model";
-import type {Folder, Playlist} from "../../../renderer/src/model";
-import type {TrackData} from "../../../renderer/src/model";
+import type {Collection, Folder, Playlist, TrackData, ParsedCollectionData} from "./model";
 
 import {parseXML} from "../file/xml";
 
 export type CollectionParseResultError = {error: string};
-export type CollectionParseResultSuccess = {
-  version: string;
-  tracks: TrackData[];
-  playlists: Playlist[];
-  tracksInPlaylistsKeys: Set<string>;
-  tracksNotInPlaylists: TrackData[];
-  tracksProbableDuplicates: TrackData[][];
-  playlistDuplicates: Map<string, string[]>;
-  path: string;
-};
-export type CollectionParseResult = CollectionParseResultError | CollectionParseResultSuccess;
+export type CollectionParseResult = CollectionParseResultError | ParsedCollectionData;
+
+const parsedCollection: ParsedCollectionData | null = null;
 
 function getPlaylists(list: (Playlist | Folder)[], folderPrefix?: string): Playlist[] {
   const result: Playlist[] = [];
