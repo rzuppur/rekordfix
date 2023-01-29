@@ -7,6 +7,7 @@ import "./security-restrictions";
 import {restoreOrCreateWindow} from "/@/mainWindow";
 import {readFileAsUtf8FromDialog} from "/@/file/read";
 import {parseCollectionXML} from "/@/rekordbox/collection";
+import {version} from "../../../package.json" assert { type: "json" };
 
 /**
  * Prevent electron from running multiple instances.
@@ -86,7 +87,11 @@ async function handlePlaylistSave(
 }
 
 function handleVersion(): string {
-  return app.getVersion();
+  let packageVersion = version ?? "unknown";
+  const appVersion = app.getVersion();
+  if (appVersion != packageVersion) packageVersion += `, build ${appVersion}`;
+
+  return packageVersion;
 }
 
 app.whenReady().then(() => {
