@@ -1,13 +1,14 @@
 import type {IpcMainInvokeEvent} from "electron";
 import type {CollectionParseResult} from "/@/rekordbox/collection";
+import type {FileWriteResult} from "/@/file/write";
 
-import {app, ipcMain, dialog, BrowserWindow} from "electron";
-import {promises} from "fs";
+import {app, ipcMain} from "electron";
 import "./security-restrictions";
 import {restoreOrCreateWindow} from "/@/mainWindow";
 import {readFileAsUtf8FromDialog} from "/@/file/read";
 import {parseCollectionXML} from "/@/rekordbox/collection";
 import {version} from "../../../package.json" assert {type: "json"};
+import {writeFile} from "/@/file/write";
 
 /**
  * Prevent electron from running multiple instances.
@@ -63,7 +64,7 @@ async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<Collecti
     return parseCollectionXML(result.contents, result.path);
   } else {
     if ("error" in result) return {error: result.error};
-    return {error: "cancelled"};
+    return {error: "Canceled"};
   }
 }
 
@@ -71,19 +72,8 @@ async function handlePlaylistSave(
   event: IpcMainInvokeEvent,
   content: string,
   filename: string,
-): Promise<string | undefined> {
-  const browserWindow = BrowserWindow.fromWebContents(event.sender);
-  if (!browserWindow) return;
-  const {filePath} = await dialog.showSaveDialog(browserWindow, {
-    title: "Save playlist",
-    defaultPath: filename,
-    buttonLabel: "Save",
-    filters: [{name: "m3u8", extensions: ["m3u8"]}],
-  });
-  if (filePath) {
-    await promises.writeFile(filePath, content, "utf-8");
-    return filePath;
-  }
+): Promise<FileWriteResult> {
+  return writeFile(event.sender, content, filename, "m3u8");
 }
 
 function handleVersion(): string {

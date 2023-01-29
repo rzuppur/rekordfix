@@ -45,7 +45,7 @@
     try {
       const collection = await collectionOpen();
       if ("error" in collection) {
-        toast("❌ " + collection.error);
+        toast(`❌ ${collection.error}`);
         resetCollection();
         return;
       }
@@ -78,8 +78,10 @@
       m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
       m3u8 += `${cleanLocationString(track.Location)}\n`;
     });
-    const path = await downloadPlaylist(m3u8, "lost_tracks");
-    if (path) toast(`✔ Playlist saved to ${path}`);
+    const result = await downloadPlaylist(m3u8, "lost_tracks");
+    if ("success" in result) toast(`✔ Playlist saved to ${result.path}`);
+    else if ("canceled" in result) toast("Dialogue canceled");
+    else toast(`❌ ${result.error}`);
     playlistSaving.value = false;
   };
 
