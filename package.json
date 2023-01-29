@@ -23,30 +23,30 @@
     "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,vue,json}\""
   },
   "devDependencies": {
-    "@rzuppur/rvc": "^0.59.0",
+    "@rzuppur/rvc": "^0.61.0",
     "@types/xml2js": "^0.4.11",
-    "@typescript-eslint/eslint-plugin": "5.37.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "@vitejs/plugin-vue": "3.1.0",
+    "@typescript-eslint/eslint-plugin": "5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@vitejs/plugin-vue": "4.0.0",
     "cross-env": "7.0.3",
-    "electron": "20.1.4",
-    "electron-builder": "23.3.3",
-    "eslint": "8.23.1",
-    "eslint-plugin-vue": "9.5.1",
-    "happy-dom": "6.0.4",
+    "electron": "22.1.0",
+    "electron-builder": "23.6.0",
+    "eslint": "8.32.0",
+    "eslint-plugin-vue": "9.9.0",
+    "happy-dom": "8.2.0",
     "nano-staged": "0.8.0",
-    "playwright": "1.25.2",
+    "playwright": "1.30.0",
     "pug": "^3.0.2",
-    "simple-git-hooks": "2.8.0",
+    "simple-git-hooks": "2.8.1",
     "stylus": "^0.59.0",
-    "typescript": "4.8.3",
-    "unplugin-auto-expose": "0.0.3",
-    "vite": "3.1.2",
-    "vue-tsc": "0.40.13"
+    "typescript": "4.9.4",
+    "unplugin-auto-expose": "0.0.4",
+    "vite": "4.0.4",
+    "vue-tsc": "1.0.24"
   },
   "dependencies": {
-    "electron-updater": "5.2.1",
-    "vue": "3.2.39",
+    "electron-updater": "5.3.0",
+    "vue": "3.2.45",
     "xml2js": "^0.4.23"
   }
 }

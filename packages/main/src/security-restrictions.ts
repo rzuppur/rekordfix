@@ -70,7 +70,7 @@ app.on("web-contents-created", (_, contents) => {
   contents.session.setPermissionRequestHandler((webContents, permission, callback) => {
     const {origin} = new URL(webContents.getURL());
 
-    const permissionGranted = !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
+    const permissionGranted = !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(<"clipboard-read" | "media" | "display-capture" | "mediaKeySystem" | "geolocation" | "notifications" | "midi" | "midiSysex" | "pointerLock" | "fullscreen" | "openExternal" | "unknown">permission);
     callback(permissionGranted);
 
     if (!permissionGranted && import.meta.env.DEV) {
