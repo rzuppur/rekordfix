@@ -7,7 +7,7 @@
   "arrowParens": "avoid",
   "proseWrap": "never",
   "htmlWhitespaceSensitivity": "strict",
-  "vueIndentScriptAndStyle": false,
+  "vueIndentScriptAndStyle": true,
   "endOfLine": "lf",
   "singleAttributePerLine": true
 }
