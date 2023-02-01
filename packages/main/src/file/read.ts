@@ -8,10 +8,7 @@ export type FileReadResultError = {error: string};
 export type FileReadResultSuccess = {contents: string; path: string};
 export type FileReadResult = FileReadResultCanceled | FileReadResultError | FileReadResultSuccess;
 
-export async function readFileAsUtf8FromDialog(
-  eventSender: IpcMainInvokeEvent["sender"],
-  extensionFilter?: string,
-): Promise<FileReadResult> {
+export async function readFileAsUtf8FromDialog(eventSender: IpcMainInvokeEvent["sender"], extensionFilter?: string): Promise<FileReadResult> {
   const browserWindow = BrowserWindow.fromWebContents(eventSender);
   if (!browserWindow) return {error: "No browser window"};
 

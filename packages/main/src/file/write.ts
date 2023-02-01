@@ -6,17 +6,9 @@ import {promises} from "fs";
 export type FileWriteResultCanceled = {canceled: true};
 export type FileWriteResultError = {error: string};
 export type FileWriteResultSuccess = {success: true; path: string};
-export type FileWriteResult =
-  | FileWriteResultCanceled
-  | FileWriteResultError
-  | FileWriteResultSuccess;
+export type FileWriteResult = FileWriteResultCanceled | FileWriteResultError | FileWriteResultSuccess;
 
-export async function writeFile(
-  eventSender: IpcMainInvokeEvent["sender"],
-  content: string,
-  filename: string,
-  extension: string,
-): Promise<FileWriteResult> {
+export async function writeFile(eventSender: IpcMainInvokeEvent["sender"], content: string, filename: string, extension: string): Promise<FileWriteResult> {
   const browserWindow = BrowserWindow.fromWebContents(eventSender);
   if (!browserWindow) return {error: "No browser window"};
 

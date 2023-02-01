@@ -68,11 +68,7 @@ async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<Collecti
   }
 }
 
-async function handlePlaylistSave(
-  event: IpcMainInvokeEvent,
-  content: string,
-  filename: string,
-): Promise<FileWriteResult> {
+async function handlePlaylistSave(event: IpcMainInvokeEvent, content: string, filename: string): Promise<FileWriteResult> {
   return writeFile(event.sender, content, filename, "m3u8");
 }
 

@@ -167,27 +167,26 @@
 
 <style lang="stylus">
 
-.block-interface-cover
-  position fixed
-  top -20px
-  bottom @top
-  left @top
-  right @top
-  z-index 1
-  background rgba(180, 180, 180, 0.3)
-  backdrop-filter blur(20px)
-
-  &:after
-    content ""
-    animation a .9s linear infinite
-    border-radius 100%
-    border 3px solid transparent
-    border-right-color var(--c-text-muted)
-    border-top-color var(--c-text-muted)
-    height 60px
-    width @height
-    position absolute
-    top "calc(50% - %s)" % (@height / 2)
+  .block-interface-cover
+    position fixed
+    top -20px
+    bottom @top
     left @top
+    right @top
+    z-index 1
+    background rgba(180, 180, 180, 0.3)
+    backdrop-filter blur(20px)
 
+    &:after
+      content ""
+      animation a .9s linear infinite
+      border-radius 100%
+      border 3px solid transparent
+      border-right-color var(--c-text-muted)
+      border-top-color var(--c-text-muted)
+      height 60px
+      width @height
+      position absolute
+      top "calc(50% - %s)" % (@height / 2)
+      left @top
 </style>

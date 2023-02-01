@@ -1,30 +1,14 @@
 import {app, shell} from "electron";
 import {URL} from "url";
 
-type Permissions =
-  | "clipboard-read"
-  | "media"
-  | "display-capture"
-  | "mediaKeySystem"
-  | "geolocation"
-  | "notifications"
-  | "midi"
-  | "midiSysex"
-  | "pointerLock"
-  | "fullscreen"
-  | "openExternal"
-  | "unknown";
+type Permissions = "clipboard-read" | "media" | "display-capture" | "mediaKeySystem" | "geolocation" | "notifications" | "midi" | "midiSysex" | "pointerLock" | "fullscreen" | "openExternal" | "unknown";
 
 /**
  * A list of origins that you allow open INSIDE the application and permissions for them.
  *
  * In development mode you need allow open `VITE_DEV_SERVER_URL`.
  */
-const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permissions>>(
-  import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL
-    ? [[new URL(import.meta.env.VITE_DEV_SERVER_URL).origin, new Set()]]
-    : [],
-);
+const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permissions>>(import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL ? [[new URL(import.meta.env.VITE_DEV_SERVER_URL).origin, new Set()]] : []);
 
 /**
  * A list of origins that you allow open IN BROWSER.
@@ -70,22 +54,7 @@ app.on("web-contents-created", (_, contents) => {
   contents.session.setPermissionRequestHandler((webContents, permission, callback) => {
     const {origin} = new URL(webContents.getURL());
 
-    const permissionGranted = !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(
-      <
-        | "clipboard-read"
-        | "media"
-        | "display-capture"
-        | "mediaKeySystem"
-        | "geolocation"
-        | "notifications"
-        | "midi"
-        | "midiSysex"
-        | "pointerLock"
-        | "fullscreen"
-        | "openExternal"
-        | "unknown"
-      >permission,
-    );
+    const permissionGranted = !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(<"clipboard-read" | "media" | "display-capture" | "mediaKeySystem" | "geolocation" | "notifications" | "midi" | "midiSysex" | "pointerLock" | "fullscreen" | "openExternal" | "unknown">permission);
     callback(permissionGranted);
 
     if (!permissionGranted && import.meta.env.DEV) {

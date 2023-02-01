@@ -42,10 +42,7 @@ function getTracks(list: (Playlist | Folder)[]): string[] {
   return result;
 }
 
-export async function parseCollectionXML(
-  contents: string,
-  path: string,
-): Promise<CollectionParseResult> {
+export async function parseCollectionXML(contents: string, path: string): Promise<CollectionParseResult> {
   try {
     const collection = await parseXML<Collection>(contents);
     if (!collection) return {error: "Could not parse XML"};
@@ -72,9 +69,7 @@ export async function parseCollectionXML(
       for (const [trackPosition, trackKey] of playlist.TRACK.map(t => t.$.Key).entries()) {
         if (trackKeys.has(trackKey)) {
           const track = tracks.find(track => track.TrackID === trackKey);
-          duplicates.push(
-            track ? `${trackPosition + 1}. ${track.Artist} - ${track.Name}` : trackKey,
-          );
+          duplicates.push(track ? `${trackPosition + 1}. ${track.Artist} - ${track.Name}` : trackKey);
         } else {
           trackKeys.add(trackKey);
         }
