@@ -1,11 +1,11 @@
 /**
  * @module preload
  */
-import type {CollectionParseResult} from "../../main/src/rekordbox/collection";
-import type {FileWriteResult} from "../../main/src/file/write";
+import type { CollectionParseResult } from "../../main/src/rekordbox/collection";
+import type { FileWriteResult } from "../../main/src/file/write";
 
-export {versions} from "./versions";
-const {ipcRenderer} = require("electron");
+export { versions } from "./versions";
+const { ipcRenderer } = require("electron");
 
 export function collectionOpen(): Promise<CollectionParseResult> {
   return ipcRenderer.invoke("dialog:collectionOpen");

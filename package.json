@@ -34,7 +34,6 @@
     "eslint": "8.32.0",
     "eslint-plugin-vue": "9.9.0",
     "happy-dom": "8.2.0",
-    "nano-staged": "0.8.0",
     "playwright": "1.30.0",
     "pug": "^3.0.2",
     "simple-git-hooks": "2.8.1",

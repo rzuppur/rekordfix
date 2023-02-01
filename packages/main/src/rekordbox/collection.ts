@@ -1,15 +1,15 @@
-import type {Collection, Folder, Playlist, TrackData, ParsedCollectionData} from "./model";
+import type { Collection, Folder, Playlist, TrackData, ParsedCollectionData } from "./model";
 
-import {parseXML} from "../file/xml";
+import { parseXML } from "../file/xml";
 
-export type CollectionParseResultError = {error: string};
+export type CollectionParseResultError = { error: string };
 export type CollectionParseResult = CollectionParseResultError | ParsedCollectionData;
 
 const parsedCollection: ParsedCollectionData | null = null;
 
 function getPlaylists(list: (Playlist | Folder)[], folderPrefix?: string): Playlist[] {
   const result: Playlist[] = [];
-  list.forEach(item => {
+  list.forEach((item) => {
     if (item.$.Type === "1") {
       const playlist = item as Playlist;
       if (folderPrefix) playlist.$.Name = `${folderPrefix} > ${playlist.$.Name}`;
@@ -27,11 +27,11 @@ function getPlaylists(list: (Playlist | Folder)[], folderPrefix?: string): Playl
 
 function getTracks(list: (Playlist | Folder)[]): string[] {
   const result: string[] = [];
-  list.forEach(item => {
+  list.forEach((item) => {
     if (item.$.Type === "1") {
       const playlist = item as Playlist;
       if (playlist.TRACK) {
-        result.push(...playlist.TRACK.map(t => t.$.Key));
+        result.push(...playlist.TRACK.map((t) => t.$.Key));
       }
     } else if (item.$.Type === "0") {
       const list = (item as Folder).NODE;
@@ -45,9 +45,9 @@ function getTracks(list: (Playlist | Folder)[]): string[] {
 export async function parseCollectionXML(contents: string, path: string): Promise<CollectionParseResult> {
   try {
     const collection = await parseXML<Collection>(contents);
-    if (!collection) return {error: "Could not parse XML"};
+    if (!collection) return { error: "Could not parse XML" };
 
-    const tracks = collection.DJ_PLAYLISTS.COLLECTION[0].TRACK.map(t => t.$);
+    const tracks = collection.DJ_PLAYLISTS.COLLECTION[0].TRACK.map((t) => t.$);
     const playlistTree = collection.DJ_PLAYLISTS.PLAYLISTS[0].NODE[0].NODE;
     const playlists = getPlaylists(playlistTree);
     const tracksInPlaylistsKeys = new Set(getTracks(playlistTree));
@@ -66,9 +66,9 @@ export async function parseCollectionXML(contents: string, path: string): Promis
       if (!playlist.TRACK || !playlist.TRACK.length) continue;
       const duplicates = [];
       const trackKeys = new Set();
-      for (const [trackPosition, trackKey] of playlist.TRACK.map(t => t.$.Key).entries()) {
+      for (const [trackPosition, trackKey] of playlist.TRACK.map((t) => t.$.Key).entries()) {
         if (trackKeys.has(trackKey)) {
-          const track = tracks.find(track => track.TrackID === trackKey);
+          const track = tracks.find((track) => track.TrackID === trackKey);
           duplicates.push(track ? `${trackPosition + 1}. ${track.Artist} - ${track.Name}` : trackKey);
         } else {
           trackKeys.add(trackKey);
@@ -84,13 +84,13 @@ export async function parseCollectionXML(contents: string, path: string): Promis
       tracks,
       playlists,
       tracksInPlaylistsKeys,
-      tracksNotInPlaylists: tracks.filter(track => !tracksInPlaylistsKeys.has(track.TrackID)),
+      tracksNotInPlaylists: tracks.filter((track) => !tracksInPlaylistsKeys.has(track.TrackID)),
       tracksProbableDuplicates,
       playlistDuplicates,
       path,
     };
   } catch (e: unknown) {
     console.error(e);
-    return {error: `${e}`};
+    return { error: `${e}` };
   }
 }

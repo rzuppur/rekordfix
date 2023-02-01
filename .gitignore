@@ -29,30 +29,5 @@ thumbs.db
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
-
-# Gradle
-.idea/**/gradle.xml
-.idea/**/libraries
-
-# Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
-# since they will be recreated, and may cause churn.  Uncomment if using
-# auto-import.
- .idea/artifacts
- .idea/compiler.xml
- .idea/jarRepositories.xml
- .idea/modules.xml
- .idea/*.iml
- .idea/modules
- *.iml
- *.ipr
-
-# Mongo Explorer plugin
-.idea/**/mongoSettings.xml
-
-# File-based project format
-*.iws
-
-# Editor-based Rest Client
 .idea/httpRequests
 /.idea/csv-plugin.xml

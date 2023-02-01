@@ -1,6 +1,6 @@
-import {app, BrowserWindow} from "electron";
-import {join} from "path";
-import {URL} from "url";
+import { app, BrowserWindow } from "electron";
+import { join } from "path";
+import { URL } from "url";
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -49,7 +49,7 @@ async function createWindow() {
  * Restore an existing BrowserWindow or Create a new BrowserWindow.
  */
 export async function restoreOrCreateWindow() {
-  let window = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+  let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 
   if (window === undefined) {
     window = await createWindow();

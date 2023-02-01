@@ -9,7 +9,6 @@
     <JSCodeStyleSettings version="0">
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
-      <option name="USE_DOUBLE_QUOTES" value="false" />
       <option name="FORCE_QUOTE_STYlE" value="true" />
       <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline" />
       <option name="SPACES_WITHIN_OBJECT_TYPE_BRACES" value="false" />
@@ -20,14 +19,16 @@
     </JSON>
     <TypeScriptCodeStyleSettings version="0">
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
+      <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACKETS" value="true" />
       <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
-      <option name="USE_DOUBLE_QUOTES" value="false" />
       <option name="FORCE_QUOTE_STYlE" value="true" />
       <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline" />
-      <option name="SPACES_WITHIN_OBJECT_TYPE_BRACES" value="false" />
+      <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
+      <option name="SPACES_WITHIN_IMPORTS" value="true" />
+      <option name="SPACE_WITHIN_TYPE_ASSERTION" value="true" />
     </TypeScriptCodeStyleSettings>
     <VueCodeStyleSettings>
-      <option name="UNIFORM_INDENT" value="false" />
+      <option name="INDENT_CHILDREN_OF_TOP_LEVEL" value="" />
       <option name="INTERPOLATION_NEW_LINE_AFTER_START_DELIMITER" value="false" />
       <option name="INTERPOLATION_NEW_LINE_BEFORE_END_DELIMITER" value="false" />
     </VueCodeStyleSettings>
@@ -40,6 +41,8 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="JavaScript">
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+      <option name="ALIGN_MULTILINE_FOR" value="false" />
       <option name="SOFT_MARGINS" value="100" />
       <indentOptions>
         <option name="INDENT_SIZE" value="2" />
@@ -48,6 +51,8 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="TypeScript">
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+      <option name="ALIGN_MULTILINE_FOR" value="false" />
       <option name="SOFT_MARGINS" value="100" />
       <indentOptions>
         <option name="INDENT_SIZE" value="2" />
@@ -56,7 +61,7 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="Vue">
-      <option name="SOFT_MARGINS" value="120" />
+      <option name="SOFT_MARGINS" value="1000" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="2" />
       </indentOptions>

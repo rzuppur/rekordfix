@@ -1,4 +1,4 @@
-import {parseString} from "xml2js";
+import { parseString } from "xml2js";
 
 export async function parseXML<T>(contents: string): Promise<T> {
   return new Promise((resolve, reject) => {

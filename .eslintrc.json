@@ -19,6 +19,13 @@
     "@typescript-eslint/consistent-type-imports": "error",
     "semi": ["error", "always"],
     "comma-dangle": ["warn", "always-multiline"],
-    "quotes": ["error", "double"]
+    "quotes": ["error", "double"],
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ]
   }
 }

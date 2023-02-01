@@ -1,13 +1,6 @@
 {
   "printWidth": 1000,
-  "semi": true,
-  "singleQuote": false,
   "trailingComma": "all",
-  "bracketSpacing": false,
-  "arrowParens": "avoid",
-  "proseWrap": "never",
   "htmlWhitespaceSensitivity": "strict",
-  "vueIndentScriptAndStyle": true,
-  "endOfLine": "lf",
   "singleAttributePerLine": true
 }

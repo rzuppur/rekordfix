@@ -1,14 +1,14 @@
-import type {IpcMainInvokeEvent} from "electron";
-import type {CollectionParseResult} from "/@/rekordbox/collection";
-import type {FileWriteResult} from "/@/file/write";
+import type { IpcMainInvokeEvent } from "electron";
+import type { CollectionParseResult } from "/@/rekordbox/collection";
+import type { FileWriteResult } from "/@/file/write";
 
-import {app, ipcMain} from "electron";
+import { app, ipcMain } from "electron";
 import "./security-restrictions";
-import {restoreOrCreateWindow} from "/@/mainWindow";
-import {readFileAsUtf8FromDialog} from "/@/file/read";
-import {parseCollectionXML} from "/@/rekordbox/collection";
-import {version} from "../../../package.json" assert {type: "json"};
-import {writeFile} from "/@/file/write";
+import { restoreOrCreateWindow } from "/@/mainWindow";
+import { readFileAsUtf8FromDialog } from "/@/file/read";
+import { parseCollectionXML } from "/@/rekordbox/collection";
+import { version } from "../../../package.json" assert { type: "json" };
+import { writeFile } from "/@/file/write";
 
 /**
  * Prevent electron from running multiple instances.
@@ -19,11 +19,6 @@ if (!isSingleInstance) {
   process.exit(0);
 }
 app.on("second-instance", restoreOrCreateWindow);
-
-/**
- * Disable Hardware Acceleration to save more system resources.
- */
-app.disableHardwareAcceleration();
 
 /**
  * Shout down background process if all windows was closed
@@ -45,7 +40,7 @@ app.on("activate", restoreOrCreateWindow);
 app
   .whenReady()
   .then(restoreOrCreateWindow)
-  .catch(e => console.error("Failed create window:", e));
+  .catch((e) => console.error("Failed create window:", e));
 
 /**
  * Check for new version of the application - production mode only.
@@ -54,8 +49,8 @@ if (import.meta.env.PROD) {
   app
     .whenReady()
     .then(() => import("electron-updater"))
-    .then(({autoUpdater}) => autoUpdater.checkForUpdatesAndNotify())
-    .catch(e => console.error("Failed check updates:", e));
+    .then(({ autoUpdater }) => autoUpdater.checkForUpdatesAndNotify())
+    .catch((e) => console.error("Failed check updates:", e));
 }
 
 async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<CollectionParseResult> {
@@ -63,8 +58,8 @@ async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<Collecti
   if ("contents" in result) {
     return parseCollectionXML(result.contents, result.path);
   } else {
-    if ("error" in result) return {error: result.error};
-    return {error: "Canceled"};
+    if ("error" in result) return { error: result.error };
+    return { error: "Canceled" };
   }
 }
 

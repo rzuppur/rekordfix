@@ -1,96 +1,96 @@
 <script lang="ts" setup>
-  import type {ParsedCollectionData} from "../../main/src/rekordbox/model";
-  import type {Ref} from "vue";
-  import {collectionOpen, downloadPlaylist, getVersion} from "#preload";
-  import {reactive, ref, watchEffect} from "vue";
-  import {useToast} from "@rzuppur/rvc";
-  import {cleanLocationString, formatSeconds} from "/@/utils";
-  import PlaylistsView from "/@/components/PlaylistsView.vue";
+import type { ParsedCollectionData } from "../../main/src/rekordbox/model";
+import type { Ref } from "vue";
+import { collectionOpen, downloadPlaylist, getVersion } from "#preload";
+import { reactive, ref, watchEffect } from "vue";
+import { useToast } from "@rzuppur/rvc";
+import { cleanLocationString, formatSeconds } from "/@/utils";
+import PlaylistsView from "/@/components/PlaylistsView.vue";
 
-  // COMMUNICATION
-  const toast = useToast();
-  const onError = (error: unknown) => {
-    console.error(error);
-    toast(`❌ ${error}`);
-  };
+// COMMUNICATION
+const toast = useToast();
+const onError = (error: unknown) => {
+  console.error(error);
+  toast(`❌ ${error}`);
+};
 
-  // STATE & DATA
-  let collection: ParsedCollectionData | Record<string, never> = reactive({});
-  const state: Ref<"UNLOADED" | "LOADING" | "LOADED" | "SAVING" | "PLAYLIST_DETAILS"> = ref("UNLOADED");
-  watchEffect(() => {
-    console.log(state.value);
-  });
+// STATE & DATA
+let collection: ParsedCollectionData | Record<string, never> = reactive({});
+const state: Ref<"UNLOADED" | "LOADING" | "LOADED" | "SAVING" | "PLAYLIST_DETAILS"> = ref("UNLOADED");
+watchEffect(() => {
+  console.log(state.value);
+});
 
-  const resetCollection = () => {
-    state.value = "UNLOADED";
-    for (const key of Object.keys(collection)) {
-      delete (collection as Record<string, unknown>)[key];
+const resetCollection = () => {
+  state.value = "UNLOADED";
+  for (const key of Object.keys(collection)) {
+    delete (collection as Record<string, unknown>)[key];
+  }
+};
+
+const actionOpenCollection = async () => {
+  state.value = "LOADING";
+
+  try {
+    const response = await collectionOpen();
+    if ("error" in response) throw new Error(response.error);
+    for (const key of Object.keys(response)) {
+      (collection as Record<string, unknown>)[key] = response[key as keyof ParsedCollectionData];
     }
-  };
+    state.value = "LOADED";
+  } catch (e) {
+    onError(e);
+    resetCollection();
+  }
+};
 
-  const actionOpenCollection = async () => {
-    state.value = "LOADING";
+const actionSaveLostPlaylist = async () => {
+  if (state.value !== "LOADED") return;
+  state.value = "SAVING";
 
-    try {
-      const response = await collectionOpen();
-      if ("error" in response) throw new Error(response.error);
-      for (const key of Object.keys(response)) {
-        (collection as Record<string, unknown>)[key] = response[key as keyof ParsedCollectionData];
-      }
-      state.value = "LOADED";
-    } catch (e) {
-      onError(e);
-      resetCollection();
+  try {
+    let m3u8 = "#EXTM3U\n";
+    collection.tracksNotInPlaylists.forEach((track) => {
+      m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
+      m3u8 += `${cleanLocationString(track.Location)}\n`;
+    });
+    const result = await downloadPlaylist(m3u8, "lost_tracks");
+    if ("success" in result) {
+      toast(`✔ Playlist saved to ${result.path}`);
+    } else if ("canceled" in result) {
+      toast("Dialogue canceled");
+    } else {
+      onError(result.error);
     }
-  };
+  } finally {
+    state.value = "LOADED";
+  }
+};
 
-  const actionSaveLostPlaylist = async () => {
-    if (state.value !== "LOADED") return;
-    state.value = "SAVING";
+const actionSaveDuplicatePlaylist = async () => {
+  if (state.value !== "LOADED") return;
+  state.value = "SAVING";
 
-    try {
-      let m3u8 = "#EXTM3U\n";
-      collection.tracksNotInPlaylists.forEach(track => {
+  try {
+    let m3u8 = "#EXTM3U\n";
+    for (const duplicateTracks of collection.tracksProbableDuplicates) {
+      for (const track of duplicateTracks) {
         m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
         m3u8 += `${cleanLocationString(track.Location)}\n`;
-      });
-      const result = await downloadPlaylist(m3u8, "lost_tracks");
-      if ("success" in result) {
-        toast(`✔ Playlist saved to ${result.path}`);
-      } else if ("canceled" in result) {
-        toast("Dialogue canceled");
-      } else {
-        onError(result.error);
       }
-    } finally {
-      state.value = "LOADED";
     }
-  };
+    const path = await downloadPlaylist(m3u8, "duplicate_tracks");
+    if (path) toast(`✔ Playlist saved to ${path}`);
+  } finally {
+    state.value = "LOADED";
+  }
+};
 
-  const actionSaveDuplicatePlaylist = async () => {
-    if (state.value !== "LOADED") return;
-    state.value = "SAVING";
-
-    try {
-      let m3u8 = "#EXTM3U\n";
-      for (const duplicateTracks of collection.tracksProbableDuplicates) {
-        for (const track of duplicateTracks) {
-          m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
-          m3u8 += `${cleanLocationString(track.Location)}\n`;
-        }
-      }
-      const path = await downloadPlaylist(m3u8, "duplicate_tracks");
-      if (path) toast(`✔ Playlist saved to ${path}`);
-    } finally {
-      state.value = "LOADED";
-    }
-  };
-
-  // GET APP VERSION
-  const version = ref("");
-  (async () => {
-    version.value = await getVersion();
-  })();
+// GET APP VERSION
+const version = ref("");
+(async () => {
+  version.value = await getVersion();
+})();
 </script>
 
 <template lang="pug">
@@ -125,7 +125,7 @@
     .r-m-t-lg(v-if="collection.tracksNotInPlaylists.length")
       h2.r-text-md.r-text-medium
         r-icon.yellow.r-m-r-sm(icon="error_circle_rounded" size="lg")
-        | {{ collection.tracksNotInPlaylists.length }} lost track{{ collection.tracksNotInPlaylists.length === 1 ? '' : 's' }}
+        | {{ collection.tracksNotInPlaylists.length }} lost track{{ collection.tracksNotInPlaylists.length === 1 ? "" : "s" }}
       .r-text-color-muted.r-m-t-xs These tracks are in collection but weren't found in any playlist. You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can either add them to a playlist or delete from collection.
       r-button.r-m-t-md(primary :action="actionSaveLostPlaylist" :loading="state === 'SAVING'" icon="download") Export tracks
     h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
@@ -167,26 +167,26 @@
 
 <style lang="stylus">
 
-  .block-interface-cover
-    position fixed
-    top -20px
-    bottom @top
-    left @top
-    right @top
-    z-index 1
-    background rgba(180, 180, 180, 0.3)
-    backdrop-filter blur(20px)
+.block-interface-cover
+  position fixed
+  top -20px
+  bottom @top
+  left @top
+  right @top
+  z-index 1
+  background rgba(180, 180, 180, 0.3)
+  backdrop-filter blur(20px)
 
-    &:after
-      content ""
-      animation a .9s linear infinite
-      border-radius 100%
-      border 3px solid transparent
-      border-right-color var(--c-text-muted)
-      border-top-color var(--c-text-muted)
-      height 60px
-      width @height
-      position absolute
-      top "calc(50% - %s)" % (@height / 2)
-      left @top
+  &:after
+    content ""
+    animation a .9s linear infinite
+    border-radius 100%
+    border 3px solid transparent
+    border-right-color var(--c-text-muted)
+    border-top-color var(--c-text-muted)
+    height 60px
+    width @height
+    position absolute
+    top "calc(50% - %s)" % (@height / 2)
+    left @top
 </style>
