@@ -5,17 +5,13 @@
     "node": true,
     "browser": false
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:vue/vue3-recommended"
-  ],
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
   "ignorePatterns": ["node_modules/**", "**/dist/**"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
@@ -23,13 +19,6 @@
     "@typescript-eslint/consistent-type-imports": "error",
     "semi": ["error", "always"],
     "comma-dangle": ["warn", "always-multiline"],
-    "vue/padding-line-between-blocks": ["error", "always"],
-    "quotes": [
-      "warn",
-      "double",
-      {
-        "avoidEscape": true
-      }
-    ]
+    "quotes": ["error", "double"]
   }
 }

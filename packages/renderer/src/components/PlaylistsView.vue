@@ -15,12 +15,7 @@
 
   const openPlaylist = (playlist: Playlist) => {
     const allTracks = [];
-    if (
-      props.collectionTracks &&
-      props.collectionTracks.length &&
-      playlist.TRACK &&
-      playlist.TRACK.length
-    ) {
+    if (props.collectionTracks && props.collectionTracks.length && playlist.TRACK && playlist.TRACK.length) {
       for (const track of playlist.TRACK) {
         const trackData = props.collectionTracks.find(t => t.TrackID === track.$.Key);
         if (trackData) allTracks.push(trackData);
