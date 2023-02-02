@@ -1,5 +1,6 @@
 import type { Collection, Folder, Playlist, TrackData, ParsedCollectionData } from "./model";
 
+import { readFileAsUtf8FromDialog } from "../file/read";
 import { writeFile } from "../file/write";
 import { parseXML } from "../file/xml";
 import { createM3u8Playlist } from "./utils";
@@ -97,6 +98,16 @@ export async function parseCollectionXML(contents: string, path: string): Promis
   } catch (e: unknown) {
     console.error(e);
     return { error: `${e}` };
+  }
+}
+
+export async function collectionOpen(eventSender: IpcMainInvokeEvent["sender"]): Promise<CollectionParseResult> {
+  const result = await readFileAsUtf8FromDialog(eventSender, "xml");
+  if ("contents" in result) {
+    return parseCollectionXML(result.contents, result.path);
+  } else {
+    if ("canceled" in result) return { error: "Dialogue canceled" };
+    return { error: result.error };
   }
 }
 

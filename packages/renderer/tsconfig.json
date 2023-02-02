@@ -11,8 +11,7 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "#preload": ["../preload/src/index"],
-      "/@/*": ["./src/*"]
+      "#preload": ["../preload/src/index"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },

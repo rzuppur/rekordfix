@@ -4,8 +4,8 @@ import type { Ref } from "vue";
 import { collectionOpen, downloadLostTracksPlaylist, downloadDuplicateTracksPlaylist, getVersion } from "#preload";
 import { reactive, ref, watchEffect } from "vue";
 import { useToast } from "@rzuppur/rvc";
-import { formatSeconds } from "/@/utils";
-import PlaylistsView from "/@/components/PlaylistsView.vue";
+import { formatSeconds } from "./utils";
+import PlaylistsView from "./components/PlaylistsView.vue";
 
 // COMMUNICATION
 const toast = useToast();

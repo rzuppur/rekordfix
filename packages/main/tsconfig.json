@@ -9,10 +9,7 @@
     "isolatedModules": true,
     "types": ["node"],
     "baseUrl": ".",
-    "resolveJsonModule": true,
-    "paths": {
-      "/@/*": ["./src/*"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
   "exclude": ["**/*.spec.ts"]

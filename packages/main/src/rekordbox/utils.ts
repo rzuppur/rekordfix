@@ -1,4 +1,4 @@
-import type { TrackData } from "/@/rekordbox/model";
+import type { TrackData } from "./model";
 
 export function cleanLocationString(location: string): string {
   return decodeURI(location).replaceAll("%26", "&");

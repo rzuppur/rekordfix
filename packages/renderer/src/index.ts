@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import App from "/@/App.vue";
+import App from "./App.vue";
 import rvc from "@rzuppur/rvc";
 import "./main.styl";
 

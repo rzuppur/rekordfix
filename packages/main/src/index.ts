@@ -1,11 +1,10 @@
 import type { IpcMainInvokeEvent } from "electron";
-import type { CollectionParseResult, DownloadPlaylistResult } from "/@/rekordbox/collection";
+import type { CollectionParseResult, DownloadPlaylistResult } from "./rekordbox/collection";
 
 import { app, ipcMain } from "electron";
 import "./security-restrictions";
-import { restoreOrCreateWindow } from "/@/mainWindow";
-import { readFileAsUtf8FromDialog } from "/@/file/read";
-import { downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist, parseCollectionXML } from "/@/rekordbox/collection";
+import { restoreOrCreateWindow } from "./mainWindow";
+import { collectionOpen, downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist } from "./rekordbox/collection";
 import { version } from "../../../package.json" assert { type: "json" };
 
 /**
@@ -52,13 +51,7 @@ if (import.meta.env.PROD) {
 }
 
 async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<CollectionParseResult> {
-  const result = await readFileAsUtf8FromDialog(event.sender, "xml");
-  if ("contents" in result) {
-    return parseCollectionXML(result.contents, result.path);
-  } else {
-    if ("error" in result) return { error: result.error };
-    return { error: "Dialogue canceled" };
-  }
+  return collectionOpen(event.sender);
 }
 
 async function handleDownloadLostTracksPlaylist(event: IpcMainInvokeEvent): Promise<DownloadPlaylistResult> {
