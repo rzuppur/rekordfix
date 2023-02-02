@@ -1,14 +1,12 @@
 import type { IpcMainInvokeEvent } from "electron";
-import type { CollectionParseResult } from "/@/rekordbox/collection";
-import type { FileWriteResult } from "/@/file/write";
+import type { CollectionParseResult, DownloadPlaylistResult } from "/@/rekordbox/collection";
 
 import { app, ipcMain } from "electron";
 import "./security-restrictions";
 import { restoreOrCreateWindow } from "/@/mainWindow";
 import { readFileAsUtf8FromDialog } from "/@/file/read";
-import { parseCollectionXML } from "/@/rekordbox/collection";
+import { downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist, parseCollectionXML } from "/@/rekordbox/collection";
 import { version } from "../../../package.json" assert { type: "json" };
-import { writeFile } from "/@/file/write";
 
 /**
  * Prevent electron from running multiple instances.
@@ -59,12 +57,16 @@ async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<Collecti
     return parseCollectionXML(result.contents, result.path);
   } else {
     if ("error" in result) return { error: result.error };
-    return { error: "Canceled" };
+    return { error: "Dialogue canceled" };
   }
 }
 
-async function handlePlaylistSave(event: IpcMainInvokeEvent, content: string, filename: string): Promise<FileWriteResult> {
-  return writeFile(event.sender, content, filename, "m3u8");
+async function handleDownloadLostTracksPlaylist(event: IpcMainInvokeEvent): Promise<DownloadPlaylistResult> {
+  return downloadLostTracksPlaylist(event.sender);
+}
+
+async function handleDownloadDuplicateTracksPlaylist(event: IpcMainInvokeEvent): Promise<DownloadPlaylistResult> {
+  return downloadDuplicateTracksPlaylist(event.sender);
 }
 
 function handleVersion(): string {
@@ -77,6 +79,7 @@ function handleVersion(): string {
 
 app.whenReady().then(() => {
   ipcMain.handle("dialog:collectionOpen", handleCollectionOpen);
-  ipcMain.handle("downloadPlaylist", handlePlaylistSave);
+  ipcMain.handle("dialog:downloadLostTracksPlaylist", handleDownloadLostTracksPlaylist);
+  ipcMain.handle("dialog:downloadDuplicateTracksPlaylist", handleDownloadDuplicateTracksPlaylist);
   ipcMain.handle("get:version", handleVersion);
 });

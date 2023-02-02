@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { ParsedCollectionData } from "../../main/src/rekordbox/model";
 import type { Ref } from "vue";
-import { collectionOpen, downloadPlaylist, getVersion } from "#preload";
+import { collectionOpen, downloadLostTracksPlaylist, downloadDuplicateTracksPlaylist, getVersion } from "#preload";
 import { reactive, ref, watchEffect } from "vue";
 import { useToast } from "@rzuppur/rvc";
-import { cleanLocationString, formatSeconds } from "/@/utils";
+import { formatSeconds } from "/@/utils";
 import PlaylistsView from "/@/components/PlaylistsView.vue";
 
 // COMMUNICATION
@@ -23,9 +23,7 @@ watchEffect(() => {
 
 const resetCollection = () => {
   state.value = "UNLOADED";
-  for (const key of Object.keys(collection)) {
-    delete (collection as Record<string, unknown>)[key];
-  }
+  collection = reactive({});
 };
 
 const actionOpenCollection = async () => {
@@ -34,9 +32,7 @@ const actionOpenCollection = async () => {
   try {
     const response = await collectionOpen();
     if ("error" in response) throw new Error(response.error);
-    for (const key of Object.keys(response)) {
-      (collection as Record<string, unknown>)[key] = response[key as keyof ParsedCollectionData];
-    }
+    collection = reactive(response);
     state.value = "LOADED";
   } catch (e) {
     onError(e);
@@ -44,43 +40,31 @@ const actionOpenCollection = async () => {
   }
 };
 
-const actionSaveLostPlaylist = async () => {
+const actionDownloadLostTracksPlaylist = async () => {
   if (state.value !== "LOADED") return;
   state.value = "SAVING";
 
   try {
-    let m3u8 = "#EXTM3U\n";
-    collection.tracksNotInPlaylists.forEach((track) => {
-      m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
-      m3u8 += `${cleanLocationString(track.Location)}\n`;
-    });
-    const result = await downloadPlaylist(m3u8, "lost_tracks");
-    if ("success" in result) {
-      toast(`✔ Playlist saved to ${result.path}`);
-    } else if ("canceled" in result) {
-      toast("Dialogue canceled");
-    } else {
-      onError(result.error);
-    }
+    const response = await downloadLostTracksPlaylist();
+    if ("error" in response) throw new Error(response.error);
+    if ("success" in response) toast(`✔ Playlist saved to ${response.path}`);
+  } catch (e) {
+    onError(e);
   } finally {
     state.value = "LOADED";
   }
 };
 
-const actionSaveDuplicatePlaylist = async () => {
+const actionDownloadDuplicateTracksPlaylist = async () => {
   if (state.value !== "LOADED") return;
   state.value = "SAVING";
 
   try {
-    let m3u8 = "#EXTM3U\n";
-    for (const duplicateTracks of collection.tracksProbableDuplicates) {
-      for (const track of duplicateTracks) {
-        m3u8 += `#EXTINF:${track.TotalTime},${track.Artist} - ${track.Name}\n`;
-        m3u8 += `${cleanLocationString(track.Location)}\n`;
-      }
-    }
-    const path = await downloadPlaylist(m3u8, "duplicate_tracks");
-    if (path) toast(`✔ Playlist saved to ${path}`);
+    const response = await downloadDuplicateTracksPlaylist();
+    if ("error" in response) throw new Error(response.error);
+    if ("success" in response) toast(`✔ Playlist saved to ${response.path}`);
+  } catch (e) {
+    onError(e);
   } finally {
     state.value = "LOADED";
   }
@@ -127,7 +111,7 @@ const version = ref("");
         r-icon.yellow.r-m-r-sm(icon="error_circle_rounded" size="lg")
         | {{ collection.tracksNotInPlaylists.length }} lost track{{ collection.tracksNotInPlaylists.length === 1 ? "" : "s" }}
       .r-text-color-muted.r-m-t-xs These tracks are in collection but weren't found in any playlist. You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can either add them to a playlist or delete from collection.
-      r-button.r-m-t-md(primary :action="actionSaveLostPlaylist" :loading="state === 'SAVING'" icon="download") Export tracks
+      r-button.r-m-t-md(primary :action="actionDownloadLostTracksPlaylist" :loading="state === 'SAVING'" icon="download") Export tracks
     h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
       r-icon.green.r-m-r-sm(icon="check" size="lg")
       | All collection tracks are in playlists
@@ -149,14 +133,14 @@ const version = ref("");
         | {{ collection.tracksProbableDuplicates.length }} probable duplicate tracks
       .r-text-color-muted.r-m-t-xs You can save these tracks to a m3u8 playlist that can be imported to Rekordbox. There you can delete one of the files from collection.
       .r-buttons.r-m-t-md.r-m-b-md
-        r-button(primary :action="actionSaveDuplicatePlaylist" :loading="state === 'SAVING'" icon="download") Export tracks
+        r-button(primary :action="actionDownloadDuplicateTracksPlaylist" :loading="state === 'SAVING'" icon="download") Export tracks
         r-button(gray :action="() => { $refs.duplicatesModal.open(); }") View list
         r-modal(ref="duplicatesModal" size="fill" title="Duplicate tracks" :buttons="false")
           .r-m-t-sm(v-for="tracks in collection.tracksProbableDuplicates")
             .r-text-bold {{ tracks[0].Artist }} - {{ tracks[0].Name }}
             .r-text-xxs.r-ellipsis(v-for="track in tracks")
               span.r-text-medium {{ formatSeconds(track.TotalTime) }}
-              span.r-text-color-muted &nbsp;{{ cleanLocationString(track.Location).replace("file://localhost/", "") }}
+              span.r-text-color-muted &nbsp;{{ track.Location.replaceAll("%26", "&").replaceAll("%20", " ").replace("file://localhost/", "") }}
     h2.r-text-md.r-text-medium.r-m-t-lg(v-else)
       r-icon.green.r-m-r-sm(icon="check" size="lg")
       | No duplicates in collection
