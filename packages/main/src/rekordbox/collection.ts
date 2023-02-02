@@ -1,8 +1,8 @@
 import type { Collection, Folder, Playlist, TrackData, ParsedCollectionData } from "./model";
 
+import { writeFile } from "../file/write";
 import { parseXML } from "../file/xml";
-import { createM3u8Playlist } from "/@/rekordbox/utils";
-import { writeFile } from "/@/file/write";
+import { createM3u8Playlist } from "./utils";
 import type { IpcMainInvokeEvent } from "electron";
 
 export type CollectionParseResultError = { error: string };
