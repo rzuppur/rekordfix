@@ -29,6 +29,7 @@ const config = {
     },
     emptyOutDir: true,
     reportCompressedSize: false,
+    chunkSizeWarningLimit: 10000,
   },
   plugins: [preload.vite()],
 };

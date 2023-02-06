@@ -5,7 +5,6 @@ import { app, ipcMain } from "electron";
 import "./security-restrictions";
 import { restoreOrCreateWindow } from "./mainWindow";
 import { collectionOpen, downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist } from "./rekordbox/collection";
-import { version } from "../../../package.json" assert { type: "json" };
 
 /**
  * Prevent electron from running multiple instances.
@@ -18,7 +17,7 @@ if (!isSingleInstance) {
 app.on("second-instance", restoreOrCreateWindow);
 
 /**
- * Shout down background process if all windows was closed
+ * Shout down background process if all windows were closed
  */
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -40,14 +39,21 @@ app
   .catch((e) => console.error("Failed create window:", e));
 
 /**
- * Check for new version of the application - production mode only.
+ * Check for app updates, install it in background and notify user that new version was installed.
+ * @see https://www.electron.build/auto-update.html#quick-setup-guide
  */
 if (import.meta.env.PROD) {
   app
     .whenReady()
     .then(() => import("electron-updater"))
-    .then(({ autoUpdater }) => autoUpdater.checkForUpdatesAndNotify())
-    .catch((e) => console.error("Failed check updates:", e));
+    .then((module) => {
+      const autoUpdater =
+        module.autoUpdater ||
+        // @ts-expect-error Hotfix for https://github.com/electron-userland/electron-builder/issues/7338
+        (module.default.autoUpdater as (typeof module)["autoUpdater"]);
+      return autoUpdater.checkForUpdatesAndNotify();
+    })
+    .catch((e) => console.error("Failed check and install updates:", e));
 }
 
 async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<CollectionParseResult> {
@@ -63,11 +69,7 @@ async function handleDownloadDuplicateTracksPlaylist(event: IpcMainInvokeEvent):
 }
 
 function handleVersion(): string {
-  let packageVersion = version ?? "unknown";
-  const appVersion = app.getVersion();
-  if (appVersion != packageVersion) packageVersion += `, build ${appVersion}`;
-
-  return packageVersion;
+  return app.getVersion();
 }
 
 app.whenReady().then(() => {

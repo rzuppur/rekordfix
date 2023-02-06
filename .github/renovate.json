@@ -1,29 +1,27 @@
 {
   "extends": [
     "config:base",
-    "group:allNonMajor",
     ":semanticCommits",
     ":semanticCommitTypeAll(deps)",
     ":semanticCommitScopeDisabled",
-    ":automergeTypes",
+    ":automergeAll",
     ":automergeBranch",
     ":disableDependencyDashboard",
     ":pinVersions",
     ":onlyNpm",
-    ":label(dependencies)",
-    "schedule:weekly"
-  ],
-  "bumpVersion": "patch",
-  "gitNoVerify": [
-    "commit",
-    "push"
+    ":label(dependencies)"
   ],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "electron"
-      ],
-      "separateMajorMinor": false
+      "groupName": "Vite packages",
+      "matchUpdateTypes": "major",
+      "matchSourceUrlPrefixes": [
+        "https://github.com/vitejs/"
+      ]
     }
+  ],
+  "gitNoVerify": [
+    "commit",
+    "push"
   ]
 }

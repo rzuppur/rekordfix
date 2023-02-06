@@ -14,11 +14,6 @@ const PACKAGE_ROOT = __dirname;
 const config = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
-  resolve: {
-    alias: {
-      "/@/": join(PACKAGE_ROOT, "src") + "/",
-    },
-  },
   base: "",
   server: {
     fs: {
@@ -35,6 +30,7 @@ const config = {
     },
     emptyOutDir: true,
     reportCompressedSize: false,
+    chunkSizeWarningLimit: 10000,
   },
   plugins: [
     vue(),

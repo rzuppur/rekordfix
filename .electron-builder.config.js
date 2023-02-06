@@ -1,27 +1,23 @@
-if (process.env.VITE_APP_VERSION === undefined) {
-  const now = new Date();
-  process.env.VITE_APP_VERSION = `${now.getUTCFullYear() - 2000}.${now.getUTCMonth() + 1}.${now.getUTCDate()}-${now.getUTCHours() * 60 + now.getUTCMinutes()}`;
-}
-
 /**
- * @type {import('electron-builder').Configuration}
+ * @type {() => import("electron-builder").Configuration}
  * @see https://www.electron.build/configuration/configuration
  */
-const config = {
-  appId: "rzuppur.rekordfix",
-  productName: "Rekordfix",
-  directories: {
-    output: "dist",
-    buildResources: "buildResources",
-  },
-  files: ["packages/**/dist/**"],
-  extraMetadata: {
-    version: process.env.VITE_APP_VERSION,
-  },
-  linux: {
-    target: ["AppImage"],
-    category: "AudioVideo",
-  },
-};
+module.exports = async function () {
+  const { getVersion } = await import("./version/getVersion.mjs");
 
-module.exports = config;
+  return {
+    appId: "rzuppur.rekordfix",
+    productName: "Rekordfix",
+    directories: {
+      output: "dist",
+      buildResources: "buildResources",
+    },
+    files: ["packages/**/dist/**"],
+    extraMetadata: {
+      version: getVersion(),
+    },
+    linux: {
+      target: "deb",
+    },
+  };
+};
