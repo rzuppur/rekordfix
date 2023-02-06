@@ -26,7 +26,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
 
       - name: Get last git tag
         id: tag
@@ -43,10 +43,10 @@ jobs:
 
       - name: Get version from current date
         id: version
-        run: echo "::set-output name=build-version::$(node -e "try{console.log(require('./.electron-builder.config.js').extraMetadata.version)}catch(e){console.error(e);process.exit(1)}")_v$(cat ./package.json | jq '.version' | tr -d '"')"
+        run: echo "::set-output name=build-version::v$(cat ./package.json | jq '.version' | tr -d '"') build $(node -e "try{console.log(require('./.electron-builder.config.js').extraMetadata.version)}catch(e){console.error(e);process.exit(1)}")"
 
       - name: Delete outdated drafts
-        uses: hugo19941994/delete-draft-releases@v1.0.0
+        uses: hugo19941994/delete-draft-releases@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -57,8 +57,8 @@ jobs:
         with:
           prerelease: true
           draft: true
-          tag_name: v${{ steps.version.outputs.build-version }}
-          name: v${{ steps.version.outputs.build-version }}
+          tag_name: ${{ steps.version.outputs.build-version }}
+          name: ${{ steps.version.outputs.build-version }}
           body: ${{ steps.release-note.outputs.release-note }}
 
   upload_artifacts:
