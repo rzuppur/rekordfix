@@ -34,15 +34,9 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
-      - name: Compile artifacts and upload them to github release
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 15
-          max_attempts: 3
-          retry_wait_seconds: 15
-          retry_on: error
-          shell: 'bash'
-          command: npx --no-install electron-builder --config .electron-builder.config.js --publish always
+      - run: npm run build
+
+      - run: npx --no-install electron-builder --config .electron-builder.config.js --publish always
         env:
           # Code Signing params
           # See https://www.electron.build/code-signing
