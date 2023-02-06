@@ -16,8 +16,12 @@ module.exports = async function () {
     extraMetadata: {
       version: getVersion(),
     },
+    mac: {
+      category: "public.app-category.music",
+    },
     linux: {
       target: "deb",
+      category: "AudioVideo",
     },
   };
 };

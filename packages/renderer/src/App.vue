@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { ParsedCollectionData } from "../../main/src/rekordbox/model";
-import type { Ref } from "vue";
-import { collectionOpen, downloadLostTracksPlaylist, downloadDuplicateTracksPlaylist, getVersion } from "#preload";
-import { reactive, ref, watchEffect } from "vue";
+import type { ComputedRef, Ref } from "vue";
+
+import { collectionOpen, downloadLostTracksPlaylist, downloadDuplicateTracksPlaylist, getVersion, downloadPlaylist } from "#preload";
+import { computed, reactive, ref, watchEffect } from "vue";
 import { useToast } from "@rzuppur/rvc";
 import { formatSeconds } from "./utils";
 import PlaylistsView from "./components/PlaylistsView.vue";
@@ -15,8 +16,9 @@ const onError = (error: unknown) => {
 };
 
 // STATE & DATA
+type ApplicationViewState = "UNLOADED" | "LOADING" | "LOADED" | "SAVING" | "PLAYLIST_DETAILS";
 let collection: ParsedCollectionData | Record<string, never> = reactive({});
-const state: Ref<"UNLOADED" | "LOADING" | "LOADED" | "SAVING" | "PLAYLIST_DETAILS"> = ref("UNLOADED");
+const state: Ref<ApplicationViewState> = ref("UNLOADED");
 watchEffect(() => {
   console.log(state.value);
 });
@@ -26,6 +28,12 @@ const resetCollection = () => {
   collection = reactive({});
 };
 
+const canSavePlaylist: ComputedRef<ApplicationViewState | false> = computed(() => {
+  if (state.value === "LOADED" || state.value === "PLAYLIST_DETAILS") return state.value;
+  return false;
+});
+
+// USER ACTIONS
 const actionOpenCollection = async () => {
   state.value = "LOADING";
 
@@ -41,7 +49,8 @@ const actionOpenCollection = async () => {
 };
 
 const actionDownloadLostTracksPlaylist = async () => {
-  if (state.value !== "LOADED") return;
+  const prevState = canSavePlaylist.value;
+  if (!prevState) return;
   state.value = "SAVING";
 
   try {
@@ -51,12 +60,13 @@ const actionDownloadLostTracksPlaylist = async () => {
   } catch (e) {
     onError(e);
   } finally {
-    state.value = "LOADED";
+    state.value = prevState;
   }
 };
 
 const actionDownloadDuplicateTracksPlaylist = async () => {
-  if (state.value !== "LOADED") return;
+  const prevState = canSavePlaylist.value;
+  if (!prevState) return;
   state.value = "SAVING";
 
   try {
@@ -66,7 +76,23 @@ const actionDownloadDuplicateTracksPlaylist = async () => {
   } catch (e) {
     onError(e);
   } finally {
-    state.value = "LOADED";
+    state.value = prevState;
+  }
+};
+
+const actionDownloadPlaylist = async (playlistName: string) => {
+  const prevState = canSavePlaylist.value;
+  if (!prevState) return;
+  state.value = "SAVING";
+
+  try {
+    const response = await downloadPlaylist(playlistName);
+    if ("error" in response) throw new Error(response.error);
+    if ("success" in response) toast(`✔ Playlist saved to ${response.path}`);
+  } catch (e) {
+    onError(e);
+  } finally {
+    state.value = prevState;
   }
 };
 
@@ -81,8 +107,7 @@ const version = ref("");
 
 .r-text-xs.r-p-b-lg.r-background-raised
 
-  .block-interface-cover(v-if="state === 'LOADING'")
-  .block-interface-cover(v-if="state === 'SAVING'")
+  .block-interface-cover(v-if="state === 'LOADING' || state === 'SAVING'")
 
   .r-p-lg(v-if="state === 'UNLOADED' || state === 'LOADING'")
     p Open your collection export to get started.
@@ -94,7 +119,12 @@ const version = ref("");
     r-button.r-m-t-lg(primary :loading="state === 'LOADING'" icon="file_open" :action="actionOpenCollection") Open XML Collection File
 
   .r-p-lg(v-else-if="state === 'PLAYLIST_DETAILS'")
-    PlaylistsView(:collectionPlaylists="collection.playlists" :collectionTracks="collection.tracks" @back="() => { state = 'LOADED'; }")
+    PlaylistsView(
+      :collectionPlaylists="collection.playlists"
+      :collectionTracks="collection.tracks"
+      @back="() => { state = 'LOADED'; }"
+      @downloadPlaylist="actionDownloadPlaylist"
+    )
 
   .r-p-lg(v-else)
 

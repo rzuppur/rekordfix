@@ -18,6 +18,10 @@ export function downloadDuplicateTracksPlaylist(): Promise<DownloadPlaylistResul
   return ipcRenderer.invoke("dialog:downloadDuplicateTracksPlaylist");
 }
 
+export function downloadPlaylist(playlistName: string): Promise<DownloadPlaylistResult> {
+  return ipcRenderer.invoke("dialog:downloadPlaylist", playlistName);
+}
+
 export function getVersion(): Promise<string> {
   return ipcRenderer.invoke("get:version");
 }

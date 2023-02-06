@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import type { Ref } from "vue";
+import type { Playlist, TrackData, PlaylistData } from "../../../main/src/rekordbox/model";
+
 import { ref } from "vue";
-import type { Playlist, TrackData } from "../../../main/src/rekordbox/model";
 
 const props = defineProps<{
   collectionPlaylists: Playlist[];
   collectionTracks: TrackData[];
 }>();
 
-const emit = defineEmits(["back"]);
+const emit = defineEmits(["back", "downloadPlaylist"]);
 
-const playlistTitle = ref("");
+const activePlaylist: Ref<PlaylistData | null> = ref(null);
 const playlistTracks: Ref<TrackData[] | null> = ref(null);
 
 const openPlaylist = (playlist: Playlist) => {
@@ -21,25 +22,35 @@ const openPlaylist = (playlist: Playlist) => {
       if (trackData) allTracks.push(trackData);
     }
   }
-  playlistTitle.value = playlist.$.Name;
+  activePlaylist.value = playlist.$;
   playlistTracks.value = allTracks;
   window.scrollTo(0, 0);
 };
 
 const closePlaylist = () => {
-  playlistTitle.value = "";
+  activePlaylist.value = null;
   playlistTracks.value = null;
 };
 </script>
 
 <template lang="pug">
 
-template(v-if="playlistTracks")
+template(v-if="activePlaylist && playlistTracks")
   r-button.r-m-b-md(:action="closePlaylist" icon="arrow_back") Back
-  h1.r-text-md.r-m-b-md.r-text-bold {{ playlistTitle }}
-  .r-m-t-xs(v-for="tracks in playlistTracks")
-    span.r-text-medium {{ tracks.Artist }}
-    span.r-text-color-muted &nbsp;- {{ tracks.Name }}
+  h1.r-text-md.r-text-bold {{ activePlaylist.Name }}
+  .r-text-color-muted.r-m-b-md.r-m-t-xs {{ activePlaylist.Entries }} tracks &middot;&nbsp;
+    a(@click="() => emit('downloadPlaylist', activePlaylist.Name)") Download
+  table.playlist-contents
+    thead
+      tr
+        th Track
+        th Artist
+        th.r-ellipsis BPM
+    tbody
+      tr.r-m-t-xs(v-for="tracks in playlistTracks")
+        td.r-text-medium {{ tracks.Name }}
+        td {{ tracks.Artist || 'Unknown Artist' }}
+        td.r-ellipsis {{ Math.round(tracks.AverageBpm) }}
 
 template(v-else)
   r-button.r-m-b-md(:action="() => { emit('back'); }" icon="arrow_back") Back
@@ -54,6 +65,15 @@ template(v-else)
 </template>
 
 <style lang="stylus">
+
+table.playlist-contents
+  border-collapse collapse
+
+  td,
+  th
+    text-align left
+    padding 4px 6px
+    border 1px solid var(--c-border-medium)
 
 .playlist-row
   cursor pointer

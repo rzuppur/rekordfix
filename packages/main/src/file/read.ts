@@ -1,7 +1,7 @@
 import type { IpcMainInvokeEvent, OpenDialogOptions } from "electron";
 
 import { BrowserWindow, dialog } from "electron";
-import { promises } from "fs";
+import { promises } from "node:fs";
 
 export type FileReadResultCanceled = { canceled: true };
 export type FileReadResultError = { error: string };

@@ -4,7 +4,7 @@ import type { CollectionParseResult, DownloadPlaylistResult } from "./rekordbox/
 import { app, ipcMain } from "electron";
 import "./security-restrictions";
 import { restoreOrCreateWindow } from "./mainWindow";
-import { collectionOpen, downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist } from "./rekordbox/collection";
+import { collectionOpen, downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist, downloadPlaylist } from "./rekordbox/collection";
 
 /**
  * Prevent electron from running multiple instances.
@@ -68,6 +68,10 @@ async function handleDownloadDuplicateTracksPlaylist(event: IpcMainInvokeEvent):
   return downloadDuplicateTracksPlaylist(event.sender);
 }
 
+async function handleDownloadPlaylist(event: IpcMainInvokeEvent, playlistName: string): Promise<DownloadPlaylistResult> {
+  return downloadPlaylist(event.sender, playlistName);
+}
+
 function handleVersion(): string {
   return app.getVersion();
 }
@@ -76,5 +80,6 @@ app.whenReady().then(() => {
   ipcMain.handle("dialog:collectionOpen", handleCollectionOpen);
   ipcMain.handle("dialog:downloadLostTracksPlaylist", handleDownloadLostTracksPlaylist);
   ipcMain.handle("dialog:downloadDuplicateTracksPlaylist", handleDownloadDuplicateTracksPlaylist);
+  ipcMain.handle("dialog:downloadPlaylist", handleDownloadPlaylist);
   ipcMain.handle("get:version", handleVersion);
 });

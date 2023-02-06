@@ -1,7 +1,7 @@
 import type { IpcMainInvokeEvent, SaveDialogOptions } from "electron";
 
 import { BrowserWindow, dialog } from "electron";
-import { promises } from "fs";
+import { promises } from "node:fs";
 
 export type FileWriteResultCanceled = { canceled: true };
 export type FileWriteResultError = { error: string };

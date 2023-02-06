@@ -1,10 +1,11 @@
 import type { Collection, Folder, Playlist, TrackData, ParsedCollectionData } from "./model";
+import type { IpcMainInvokeEvent } from "electron";
 
 import { readFileAsUtf8FromDialog } from "../file/read";
 import { writeFile } from "../file/write";
 import { parseXML } from "../file/xml";
 import { createM3u8Playlist } from "./utils";
-import type { IpcMainInvokeEvent } from "electron";
+import sanitize from "sanitize-filename";
 
 export type CollectionParseResultError = { error: string };
 export type CollectionParseResult = CollectionParseResultError | ParsedCollectionData;
@@ -130,6 +131,20 @@ export async function downloadDuplicateTracksPlaylist(eventSender: IpcMainInvoke
 
   const playlistFileContents = createM3u8Playlist(parsedCollection.tracksProbableDuplicates.reduce((prev, current) => prev.concat(current), []));
   const result = await writeFile(eventSender, playlistFileContents, "duplicate_tracks", "m3u8");
+
+  if ("canceled" in result) return { error: "Dialogue canceled" };
+  return result;
+}
+
+export async function downloadPlaylist(eventSender: IpcMainInvokeEvent["sender"], playlistName: string): Promise<DownloadPlaylistResult> {
+  if (!parsedCollection) return { error: "No collection loaded" };
+
+  const playlist = parsedCollection.playlists.find((playlist) => playlist.$.Name === playlistName);
+  if (!playlist) return { error: `Invalid playlist name: ${playlistName}` };
+
+  const playlistTracks: TrackData[] = playlist.TRACK.map((playlistTrack) => parsedCollection?.tracks.find((track) => track.TrackID === playlistTrack.$.Key)).filter((track) => !!track) as TrackData[];
+  const playlistFileContents = createM3u8Playlist(playlistTracks);
+  const result = await writeFile(eventSender, playlistFileContents, sanitize(playlistName, { replacement: "_" }), "m3u8");
 
   if ("canceled" in result) return { error: "Dialogue canceled" };
   return result;

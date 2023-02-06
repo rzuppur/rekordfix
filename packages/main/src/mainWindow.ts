@@ -1,12 +1,12 @@
 import { app, BrowserWindow } from "electron";
-import { join } from "path";
-import { URL } from "url";
+import { join } from "node:path";
+import { URL } from "node:url";
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
-    width: 600,
-    height: 500,
+    width: import.meta.env.DEV ? 1100 : 600,
+    height: 600,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -29,7 +29,7 @@ async function createWindow() {
     browserWindow?.show();
 
     if (import.meta.env.DEV) {
-      //browserWindow?.webContents.openDevTools();
+      browserWindow?.webContents.openDevTools();
     }
   });
 
