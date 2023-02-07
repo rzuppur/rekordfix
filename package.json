@@ -29,11 +29,11 @@
     "format": "npx --yes prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,vue,json}\""
   },
   "devDependencies": {
-    "@rzuppur/rvc": "^0.61.0",
+    "@rzuppur/rvc": "0.61.0",
     "@types/node": "18.11.19",
-    "@types/xml2js": "^0.4.11",
+    "@types/xml2js": "0.4.11",
     "@typescript-eslint/eslint-plugin": "5.50.0",
-    "@typescript-eslint/parser": "^5.49.0",
+    "@typescript-eslint/parser": "5.50.0",
     "@vitejs/plugin-vue": "4.0.0",
     "cross-env": "7.0.3",
     "electron": "22.2.0",
@@ -42,9 +42,9 @@
     "eslint-plugin-vue": "9.9.0",
     "happy-dom": "8.2.6",
     "playwright": "1.30.0",
-    "pug": "^3.0.2",
+    "pug": "3.0.2",
     "simple-git-hooks": "2.8.1",
-    "stylus": "^0.59.0",
+    "stylus": "0.59.0",
     "typescript": "4.9.5",
     "unplugin-auto-expose": "0.0.4",
     "vite": "4.1.1",
@@ -53,10 +53,10 @@
   },
   "dependencies": {
     "electron-updater": "5.3.0",
-    "sanitize-filename": "^1.6.3",
-    "xml2js": "^0.4.23"
+    "sanitize-filename": "1.6.3",
+    "xml2js": "0.4.23"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "19.6.0"
   }
 }
