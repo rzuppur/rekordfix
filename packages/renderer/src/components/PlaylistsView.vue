@@ -50,7 +50,7 @@ template(v-if="activePlaylist && playlistTracks")
       tr.r-m-t-xs(v-for="tracks in playlistTracks")
         td.r-text-medium {{ tracks.Name }}
         td {{ tracks.Artist || 'Unknown Artist' }}
-        td.r-ellipsis {{ Math.round(tracks.AverageBpm) }}
+        td.r-ellipsis {{ Math.round(+tracks.AverageBpm) }}
 
 template(v-else)
   r-button.r-m-b-md(:action="() => { emit('back'); }" icon="arrow_back") Back

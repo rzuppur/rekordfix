@@ -1,10 +1,9 @@
 import type { IpcMainInvokeEvent } from "electron";
-import type { CollectionParseResult, DownloadPlaylistResult } from "./rekordbox/collection";
 
 import { app, ipcMain } from "electron";
 import "./security-restrictions";
 import { restoreOrCreateWindow } from "./mainWindow";
-import { collectionOpen, downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist, downloadPlaylist } from "./rekordbox/collection";
+import { collectionOpen, downloadDuplicateTracksPlaylist, downloadLostTracksPlaylist, downloadPlaylist, findDeletedTrackFiles, keepTrackFile, deleteTrackFile } from "./rekordbox/collection";
 
 /**
  * Prevent electron from running multiple instances.
@@ -56,20 +55,32 @@ if (import.meta.env.PROD) {
     .catch((e) => console.error("Failed check and install updates:", e));
 }
 
-async function handleCollectionOpen(event: IpcMainInvokeEvent): Promise<CollectionParseResult> {
+async function handleCollectionOpen(event: IpcMainInvokeEvent) {
   return collectionOpen(event.sender);
 }
 
-async function handleDownloadLostTracksPlaylist(event: IpcMainInvokeEvent): Promise<DownloadPlaylistResult> {
+async function handleDownloadLostTracksPlaylist(event: IpcMainInvokeEvent) {
   return downloadLostTracksPlaylist(event.sender);
 }
 
-async function handleDownloadDuplicateTracksPlaylist(event: IpcMainInvokeEvent): Promise<DownloadPlaylistResult> {
+async function handleDownloadDuplicateTracksPlaylist(event: IpcMainInvokeEvent) {
   return downloadDuplicateTracksPlaylist(event.sender);
 }
 
-async function handleDownloadPlaylist(event: IpcMainInvokeEvent, playlistName: string): Promise<DownloadPlaylistResult> {
+async function handleDownloadPlaylist(event: IpcMainInvokeEvent, playlistName: string) {
   return downloadPlaylist(event.sender, playlistName);
+}
+
+async function handleFindDeletedTrackFiles(event: IpcMainInvokeEvent) {
+  return findDeletedTrackFiles(event.sender);
+}
+
+async function handleKeepTrackFile(event: IpcMainInvokeEvent, path: string) {
+  return keepTrackFile(path);
+}
+
+async function handleDeleteTrackFile(event: IpcMainInvokeEvent, path: string) {
+  return deleteTrackFile(path);
 }
 
 function handleVersion(): string {
@@ -81,5 +92,8 @@ app.whenReady().then(() => {
   ipcMain.handle("dialog:downloadLostTracksPlaylist", handleDownloadLostTracksPlaylist);
   ipcMain.handle("dialog:downloadDuplicateTracksPlaylist", handleDownloadDuplicateTracksPlaylist);
   ipcMain.handle("dialog:downloadPlaylist", handleDownloadPlaylist);
+  ipcMain.handle("dialog:findDeletedTrackFiles", handleFindDeletedTrackFiles);
+  ipcMain.handle("action:keepTrackFile", handleKeepTrackFile);
+  ipcMain.handle("action:deleteTrackFile", handleDeleteTrackFile);
   ipcMain.handle("get:version", handleVersion);
 });

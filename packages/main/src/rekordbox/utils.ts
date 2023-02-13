@@ -1,5 +1,8 @@
 import type { TrackData } from "./model";
 
+import { URL } from "node:url";
+import { sep } from "node:path";
+
 export function cleanLocationString(location: string): string {
   return decodeURI(location).replaceAll("%26", "&");
 }
@@ -11,4 +14,9 @@ export function createM3u8Playlist(tracks: TrackData[]): string {
     m3u8 += `${cleanLocationString(track.Location)}\n`;
   }
   return m3u8;
+}
+
+export function collectionTrackLocationToPath(location: string): string {
+  const urlPathname: string = new URL(location).pathname;
+  return decodeURIComponent(urlPathname.replaceAll("/", sep).replace(/^\\(?=[A-Z]:\\)/, ""));
 }

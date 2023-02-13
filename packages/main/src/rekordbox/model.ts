@@ -110,3 +110,8 @@ export interface ParsedCollectionData {
   playlistDuplicates: Map<string, string[]>;
   path: string;
 }
+
+export interface FilePathWithSize {
+  path: string;
+  size: number;
+}

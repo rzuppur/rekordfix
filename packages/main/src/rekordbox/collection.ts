@@ -1,14 +1,15 @@
-import type { Collection, Folder, Playlist, TrackData, ParsedCollectionData } from "./model";
+import type { Collection, Folder, Playlist, TrackData, ParsedCollectionData, FilePathWithSize } from "./model";
 import type { IpcMainInvokeEvent } from "electron";
+import type { GenericResult, GenericResultError } from "../model";
 
-import { readFileAsUtf8FromDialog } from "../file/read";
-import { writeFile } from "../file/write";
+import { dirname, join, basename } from "node:path";
+import { getFileSize, readDirectoryTree, readFileAsUtf8FromDialog } from "../file/read";
+import { ensureDirectory, moveFile, writeFile } from "../file/write";
 import { parseXML } from "../file/xml";
-import { createM3u8Playlist } from "./utils";
+import { collectionTrackLocationToPath, createM3u8Playlist } from "./utils";
 import sanitize from "sanitize-filename";
 
-export type CollectionParseResultError = { error: string };
-export type CollectionParseResult = CollectionParseResultError | ParsedCollectionData;
+export type CollectionParseResult = GenericResultError | ParsedCollectionData;
 
 let parsedCollection: ParsedCollectionData | null = null;
 
@@ -107,33 +108,25 @@ export async function collectionOpen(eventSender: IpcMainInvokeEvent["sender"]):
   if ("contents" in result) {
     return parseCollectionXML(result.contents, result.path);
   } else {
-    if ("canceled" in result) return { error: "Dialogue canceled" };
     return { error: result.error };
   }
 }
 
-export type DownloadPlaylistResultError = { error: string };
-export type DownloadPlaylistResultSuccess = { success: true; path: string };
-export type DownloadPlaylistResult = DownloadPlaylistResultError | DownloadPlaylistResultSuccess;
+export type DownloadPlaylistResultSuccess = { path: string };
+export type DownloadPlaylistResult = GenericResultError | DownloadPlaylistResultSuccess;
 
 export async function downloadLostTracksPlaylist(eventSender: IpcMainInvokeEvent["sender"]): Promise<DownloadPlaylistResult> {
   if (!parsedCollection) return { error: "No collection loaded" };
 
   const playlistFileContents = createM3u8Playlist(parsedCollection.tracksNotInPlaylists);
-  const result = await writeFile(eventSender, playlistFileContents, "lost_tracks", "m3u8");
-
-  if ("canceled" in result) return { error: "Dialogue canceled" };
-  return result;
+  return writeFile(eventSender, playlistFileContents, "lost_tracks", "m3u8");
 }
 
 export async function downloadDuplicateTracksPlaylist(eventSender: IpcMainInvokeEvent["sender"]): Promise<DownloadPlaylistResult> {
   if (!parsedCollection) return { error: "No collection loaded" };
 
   const playlistFileContents = createM3u8Playlist(parsedCollection.tracksProbableDuplicates.reduce((prev, current) => prev.concat(current), []));
-  const result = await writeFile(eventSender, playlistFileContents, "duplicate_tracks", "m3u8");
-
-  if ("canceled" in result) return { error: "Dialogue canceled" };
-  return result;
+  return writeFile(eventSender, playlistFileContents, "duplicate_tracks", "m3u8");
 }
 
 export async function downloadPlaylist(eventSender: IpcMainInvokeEvent["sender"], playlistName: string): Promise<DownloadPlaylistResult> {
@@ -144,8 +137,43 @@ export async function downloadPlaylist(eventSender: IpcMainInvokeEvent["sender"]
 
   const playlistTracks: TrackData[] = playlist.TRACK.map((playlistTrack) => parsedCollection?.tracks.find((track) => track.TrackID === playlistTrack.$.Key)).filter((track) => !!track) as TrackData[];
   const playlistFileContents = createM3u8Playlist(playlistTracks);
-  const result = await writeFile(eventSender, playlistFileContents, sanitize(playlistName, { replacement: "_" }), "m3u8");
+  return writeFile(eventSender, playlistFileContents, sanitize(playlistName, { replacement: "_" }), "m3u8");
+}
 
-  if ("canceled" in result) return { error: "Dialogue canceled" };
-  return result;
+export type FindDeletedTrackFilesResponse = GenericResultError | { paths: FilePathWithSize[] };
+
+export async function findDeletedTrackFiles(eventSender: IpcMainInvokeEvent["sender"]): Promise<FindDeletedTrackFilesResponse> {
+  if (!parsedCollection) return { error: "No collection loaded" };
+
+  const result = await readDirectoryTree(eventSender);
+  if ("error" in result) return { error: result.error };
+
+  const collectionTrackPaths: string[] = parsedCollection.tracks.map((track) => collectionTrackLocationToPath(track.Location));
+  const notInCollectionFiles: FilePathWithSize[] = [];
+  for (const item of result.tree.children) {
+    if (item.type === "FOLDER" || !["mp3", "wav", "aac", "flac", "alac", "aiff"].includes(item.extension)) continue;
+    if (!collectionTrackPaths.includes(item.path)) {
+      notInCollectionFiles.push({ path: item.path, size: await getFileSize(item.path) });
+    }
+  }
+
+  return { paths: notInCollectionFiles };
+}
+
+export async function keepTrackFile(path: string): Promise<GenericResult> {
+  const folderPath = join(dirname(path), "KEEP");
+  const directoryResult = await ensureDirectory(folderPath);
+  if ("error" in directoryResult) return directoryResult;
+
+  const newPath = join(folderPath, basename(path));
+  return await moveFile(path, newPath);
+}
+
+export async function deleteTrackFile(path: string): Promise<GenericResult> {
+  const folderPath = join(dirname(path), "DELETE");
+  const directoryResult = await ensureDirectory(folderPath);
+  if ("error" in directoryResult) return directoryResult;
+
+  const newPath = join(folderPath, basename(path));
+  return await moveFile(path, newPath);
 }
