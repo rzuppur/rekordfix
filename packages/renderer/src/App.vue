@@ -134,6 +134,7 @@ const unloadAudio = async () => {
 
 const actionKeepTrackFile = async (path: string) => {
   await unloadAudio();
+  if (!deletedTrackFiles.value) return;
   const restoreCopy = [...deletedTrackFiles.value];
   deletedTrackFiles.value = deletedTrackFiles.value.filter((trackFile) => trackFile.path !== path);
   try {
@@ -148,6 +149,7 @@ const actionKeepTrackFile = async (path: string) => {
 
 const actionDeleteTrackFile = async (path: string) => {
   await unloadAudio();
+  if (!deletedTrackFiles.value) return;
   const restoreCopy = [...deletedTrackFiles.value];
   deletedTrackFiles.value = deletedTrackFiles.value.filter((trackFile) => trackFile.path !== path);
   try {
