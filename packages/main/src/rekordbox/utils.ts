@@ -17,6 +17,6 @@ export function createM3u8Playlist(tracks: TrackData[]): string {
 }
 
 export function collectionTrackLocationToPath(location: string): string {
-  const urlPathname: string = new URL(location).pathname;
+  const urlPathname: string = new URL(location.replaceAll("#", "%23")).pathname;
   return decodeURIComponent(urlPathname.replaceAll("/", sep).replace(/^\\(?=[A-Z]:\\)/, ""));
 }
