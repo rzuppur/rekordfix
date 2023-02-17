@@ -24,7 +24,7 @@ const state: Ref<ApplicationViewState> = ref("UNLOADED");
 const resetCollection = () => {
   state.value = "UNLOADED";
   collection = reactive({});
-  deletedTrackFiles.value = [];
+  deletedTrackFiles.value = null;
 };
 
 const canSavePlaylist: ComputedRef<ApplicationViewState | false> = computed(() => {
@@ -96,7 +96,7 @@ const actionDownloadPlaylist = async (playlistName: string) => {
 };
 
 // FIND DELETED TRACKS
-const deletedTrackFiles: Ref<FilePathWithSize[]> = ref([]);
+const deletedTrackFiles: Ref<FilePathWithSize[] | null> = ref(null);
 const deletedTrackFileSelectedIndex: Ref<number | null> = ref(null);
 const audioPlayerRef: Ref<null | HTMLAudioElement[]> = ref(null);
 
@@ -110,7 +110,7 @@ const actionFindDeletedTrackFiles = async () => {
     if ("error" in response) throw new Error(response.error);
     deletedTrackFiles.value = response.paths;
   } catch (e) {
-    deletedTrackFiles.value = [];
+    deletedTrackFiles.value = null;
     onError(e);
   } finally {
     state.value = prevState;
@@ -255,7 +255,7 @@ const formatSizeToMB = (size: number): string => {
     h2.r-text-md.r-text-medium
       r-icon.r-m-r-sm.gray(icon="delete_forever" size="lg")
       | Remove deleted files
-    template(v-if="deletedTrackFiles.length")
+    template(v-if="deletedTrackFiles && deletedTrackFiles.length")
       .r-text-color-muted.r-m-t-sm Nothing is actually deleted from this interface. Tracks are moved to folders KEEP and DELETE where you can either drag them back to your library or select all + really delete the files.
       .r-m-t-lg.r-m-b-md
         b Found {{ deletedTrackFiles.length }} files not in Rekordbox collection ({{ formatSizeToMB(deletedTrackFiles.reduce((prev: number, curr: FilePathWithSize) => prev + curr.size, 0)) }})
@@ -269,6 +269,8 @@ const formatSizeToMB = (size: number): string => {
           .r-buttons.r-m-t-sm
             r-button(icon="check" icon-color="green" :action="() => actionKeepTrackFile(file.path)") Keep
             r-button(icon="delete" icon-color="red" :action="() => actionDeleteTrackFile(file.path)") Delete
+    template(v-else-if="deletedTrackFiles")
+      .r-text-color-muted.r-m-t-sm No deleted files found from selected folder.
     template(v-else)
       .r-text-color-muted.r-m-t-sm Clean up track files from disk that have been removed from Rekordbox collection.
       .r-text-color-muted.r-m-t-sm This assumes your collection music files are in a single folder and it contains only music that should be or has been in your Rekordbox library.
