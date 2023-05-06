@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@rzuppur/rvc": "0.61.0",
-    "@types/node": "18.16.3",
+    "@types/node": "18.16.5",
     "@types/xml2js": "0.4.11",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
