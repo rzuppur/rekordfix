@@ -46,7 +46,7 @@
     "simple-git-hooks": "2.8.1",
     "stylus": "0.59.0",
     "typescript": "5.0.4",
-    "unplugin-auto-expose": "0.0.4",
+    "unplugin-auto-expose": "0.0.5",
     "vite": "4.3.9",
     "vue": "3.3.4",
     "vue-tsc": "1.6.5"
