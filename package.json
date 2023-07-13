@@ -41,7 +41,7 @@
     "eslint": "8.44.0",
     "eslint-plugin-vue": "9.15.1",
     "happy-dom": "10.0.3",
-    "playwright": "1.35.1",
+    "playwright": "1.36.0",
     "pug": "3.0.2",
     "simple-git-hooks": "2.8.1",
     "stylus": "0.59.0",
