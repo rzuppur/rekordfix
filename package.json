@@ -43,7 +43,7 @@
     "happy-dom": "10.5.2",
     "playwright": "1.36.1",
     "pug": "3.0.2",
-    "simple-git-hooks": "2.8.1",
+    "simple-git-hooks": "2.9.0",
     "stylus": "0.59.0",
     "typescript": "5.1.6",
     "unplugin-auto-expose": "0.0.5",
