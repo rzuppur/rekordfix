@@ -54,7 +54,7 @@
   "dependencies": {
     "electron-updater": "6.1.1",
     "sanitize-filename": "1.6.3",
-    "xml2js": "0.6.0"
+    "xml2js": "0.6.2"
   },
   "engines": {
     "node": "19.9.0"
