@@ -39,7 +39,7 @@
     "electron": "25.3.2",
     "electron-builder": "24.6.3",
     "eslint": "8.46.0",
-    "eslint-plugin-vue": "9.15.1",
+    "eslint-plugin-vue": "9.16.1",
     "happy-dom": "10.5.2",
     "playwright": "1.36.2",
     "pug": "3.0.2",
