@@ -44,7 +44,7 @@
     "playwright": "1.37.1",
     "pug": "3.0.2",
     "simple-git-hooks": "2.9.0",
-    "stylus": "0.59.0",
+    "stylus": "0.60.0",
     "typescript": "5.2.2",
     "unplugin-auto-expose": "0.0.5",
     "vite": "4.4.9",
