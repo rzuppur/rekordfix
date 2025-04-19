@@ -45,7 +45,7 @@
     "pug": "3.0.3",
     "simple-git-hooks": "2.9.0",
     "stylus": "0.61.0",
-    "typescript": "5.2.2",
+    "typescript": "5.8.3",
     "unplugin-auto-expose": "0.0.5",
     "vite": "4.5.13",
     "vue": "3.3.8",
