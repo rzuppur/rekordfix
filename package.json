@@ -52,7 +52,7 @@
     "vue-tsc": "1.8.27"
   },
   "dependencies": {
-    "electron-updater": "6.3.0",
+    "electron-updater": "6.6.2",
     "sanitize-filename": "1.6.3",
     "xml2js": "0.6.2"
   },
