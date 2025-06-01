@@ -267,7 +267,7 @@ const formatSizeToMB = (size: number): string => {
           .path.r-m-r-md.r-ellipsis(v-else) ...\{{ file.path.split(String.fromCharCode(92)).slice(-2).join(String.fromCharCode(92)) }}
           .size.r-text-color-muted {{ formatSizeToMB(file.size) }}
         template(v-if="deletedTrackFileSelectedIndex === i")
-          audio.r-m-t-sm(autoplay controls="true" :src="`file:///${encodeURI(file.path.replaceAll(String.fromCharCode(92), '/')).replaceAll('#', '%23')}`" ref="audioPlayerRef")
+          audio.r-m-t-sm(autoplay controls="true" :src="`media://${encodeURI(file.path.replaceAll(String.fromCharCode(92), '/')).replaceAll('#', '%23')}`" ref="audioPlayerRef")
           .r-buttons.r-m-t-sm
             r-button(icon="check" icon-color="green" :action="() => actionKeepTrackFile(file.path)") Keep
             r-button(icon="delete" icon-color="red" :action="() => actionDeleteTrackFile(file.path)") Delete

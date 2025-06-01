@@ -2,7 +2,7 @@
   "name": "rekordfix",
   "description": "GUI tool for missing functionality to manage a Rekordbox collection",
   "private": true,
-  "version": "0.15.0",
+  "version": "0.16.0",
   "author": {
     "email": "reino@reinozuppur.com",
     "name": "Reino Zuppur",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@rzuppur/rvc": "0.61.0",
+    "@types/mime-types": "^3.0.0",
     "@types/node": "22.15.29",
     "@types/xml2js": "0.4.14",
     "@typescript-eslint/eslint-plugin": "6.21.0",
@@ -46,17 +47,18 @@
     "simple-git-hooks": "2.13.0",
     "stylus": "0.64.0",
     "typescript": "5.8.3",
-    "unplugin-auto-expose": "0.3.0",
+    "unplugin-auto-expose": "0.0.5",
     "vite": "6.3.5",
     "vue": "3.5.16",
     "vue-tsc": "2.2.10"
   },
   "dependencies": {
     "electron-updater": "6.6.2",
+    "mime-types": "^3.0.1",
     "sanitize-filename": "1.6.3",
     "xml2js": "0.6.2"
   },
   "engines": {
-    "node": "22.16.0"
+    "node": ">=22"
   }
 }

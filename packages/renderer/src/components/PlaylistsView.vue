@@ -39,7 +39,7 @@ template(v-if="activePlaylist && playlistTracks")
   r-button.r-m-b-md(:action="closePlaylist" icon="arrow_back") Back
   h1.r-text-md.r-text-bold {{ activePlaylist.Name }}
   .r-text-color-muted.r-m-b-md.r-m-t-xs {{ activePlaylist.Entries }} tracks &middot;&nbsp;
-    a(@click="() => emit('downloadPlaylist', activePlaylist.Name)") Download
+    a(@click="() => emit('downloadPlaylist', activePlaylist.Name)") Export playlist
   table.playlist-contents
     thead
       tr
